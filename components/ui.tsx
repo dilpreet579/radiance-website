@@ -24,7 +24,7 @@ export function SponsorLine({ sponsor, size = 12 }: { sponsor: Sponsor; size?: n
   return (
     <div className="flex items-center gap-3 font-mono uppercase tracking-[.12em] text-muted" style={{ fontSize: size }}>
       <span>Title Sponsor</span>
-      <LogoSlot logo={sponsor.logo_url} />
+      <LogoSlot h={32} logo={sponsor.logo_url} />
       <span className="text-cream">{sponsor.name}</span>
     </div>
   );

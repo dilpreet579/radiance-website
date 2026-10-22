@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import sharp from "sharp";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { moveRow, nextPosition } from "@/lib/reorder";
@@ -14,9 +15,20 @@ async function uploadLogo(file: File): Promise<string> {
   if (file.size > 4 * 1024 * 1024) throw new Error("Logo must be under 4 MB");
   const sb = db();
   await sb.storage.createBucket(BUCKET, { public: true }).catch(() => {}); // already exists is fine
-  const ext = (file.name.split(".").pop() ?? "png").toLowerCase().replace(/[^a-z0-9]/g, "");
+  let body: Buffer = Buffer.from(await file.arrayBuffer());
+  let type = file.type, ext = (file.name.split(".").pop() ?? "png").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (type !== "image/svg+xml") {
+    // Logos often come as huge canvases with empty margins, which render tiny in the header.
+    // Crop the empty border and cap the width so it fills its slot and loads fast.
+    try {
+      body = await sharp(body).trim({ threshold: 10 }).resize({ width: 1200, withoutEnlargement: true }).png().toBuffer();
+      type = "image/png"; ext = "png";
+    } catch {
+      throw new Error("Could not read that image. Use a PNG, JPG, WebP or SVG.");
+    }
+  }
   const path = `${Date.now()}.${ext}`;
-  const { error } = await sb.storage.from(BUCKET).upload(path, file, { contentType: file.type, upsert: true });
+  const { error } = await sb.storage.from(BUCKET).upload(path, body, { contentType: type, upsert: true });
   if (error) throw new Error("Upload failed: " + error.message);
   return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }

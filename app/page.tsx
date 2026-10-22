@@ -27,7 +27,7 @@ export default async function Home() {
             <div className="font-display text-[clamp(34px,5vw,56px)] font-extrabold leading-none tracking-[-.02em] text-gold">26 Oct – 5 Nov</div>
             <div className="flex items-center gap-3 text-[15px] text-soft">
               <span>In association with</span>
-              <LogoSlot h={24} logo={sponsor.logo_url} />
+              <LogoSlot h={40} logo={sponsor.logo_url} />
               <span className="font-bold text-cream">{sponsor.name}</span>
               <span className="rounded-[3px] border border-gold/60 px-2 py-[3px] font-mono text-[11px] uppercase tracking-[.12em] text-gold">Title Sponsor</span>
             </div>
