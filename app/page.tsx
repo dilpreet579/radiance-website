@@ -78,9 +78,9 @@ export default async function Home() {
           <div className="border-b border-cream/[.18]">
             {SCHEDULE.map((d) => (
               <Link key={d.title} href={d.href} className="-mx-4 flex flex-wrap items-baseline gap-x-8 gap-y-2.5 border-t border-cream/[.18] px-4 py-[26px] text-cream hover:bg-cream/[.06] hover:text-cream">
-                <div className="flex basis-[150px] items-baseline gap-3">
+                <div className="flex basis-[200px] items-baseline gap-3">
                   <span className="font-display text-5xl font-extrabold leading-none text-gold">{d.day}</span>
-                  <span className="font-mono text-xs uppercase tracking-[.12em] text-muted">{d.mon} · {d.dow}</span>
+                  <span className="whitespace-nowrap font-mono text-xs uppercase tracking-[.12em] text-muted">{d.mon} · {d.dow}</span>
                 </div>
                 <div className="basis-80 flex-1">
                   <div className="font-display text-[clamp(21px,2.4vw,28px)] font-bold leading-[1.15]">{d.title}</div>
