@@ -22,9 +22,9 @@ export default function PhotoWalk() {
           </div>
           <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(160px,1fr))]">
             {WALK_SESSIONS.map((s) => (
-              <div key={s.n} className="flex flex-col gap-1.5 rounded-lg border border-cream/25 bg-ink/35 p-[18px]">
+              <div key={s.n} className="flex flex-col gap-1.5 rounded-lg border border-cream/25 bg-ink/35 p-4 sm:p-[18px]">
                 <span className="font-mono text-xs tracking-[.12em] text-gold">{s.n} / 05</span>
-                <span className="font-display text-[22px] font-bold leading-[1.1]">{s.t}</span>
+                <span className="font-display text-xl font-bold leading-[1.1] sm:text-[22px]">{s.t}</span>
                 <span className="text-sm text-muted">{s.d}</span>
               </div>
             ))}

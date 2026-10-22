@@ -20,7 +20,7 @@ export default async function Inaugural() {
               <div className="eyebrow mb-2">What happens</div>
               {INAUG_STEPS.map((s) => (
                 <div key={s.n} className="flex gap-[22px] border-t border-cream/20 py-[22px]">
-                  <span className="basis-14 font-display text-[40px] font-extrabold leading-none text-gold">{s.n}</span>
+                  <span className="w-16 shrink-0 font-display text-[40px] font-extrabold leading-none text-gold">{s.n}</span>
                   <div>
                     <div className="font-display text-[26px] font-bold leading-[1.15]">{s.t}</div>
                     <div className="mt-1 text-muted">{s.d}</div>
@@ -34,7 +34,7 @@ export default async function Inaugural() {
                 <div className="eyebrow">Stand-up comedy</div>
                 <div className="font-display text-[32px] font-extrabold leading-[1.05]">Vaibhav Karn</div>
                 <p className="m-0 text-base text-soft">Short bio to be added. The comedy show is for NIT Delhi students only, and the show guidelines are accepted at registration.</p>
-                <a href="https://www.instagram.com/vaibhavkarn_here" target="_blank" rel="noopener noreferrer" className="inline-flex gap-2 text-[15px] font-bold">Vaibhav Karn on Instagram <span>↗</span></a>
+                <a href="https://www.instagram.com/vaibhavkarn_here" target="_blank" rel="noopener noreferrer" className="inline-flex gap-2 py-2 text-[15px] font-bold">Vaibhav Karn on Instagram <span>↗</span></a>
               </div>
             </div>
           </div>

@@ -25,8 +25,8 @@ export default async function Home() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-11 gap-y-3.5">
             <div className="font-display text-[clamp(34px,5vw,56px)] font-extrabold leading-none tracking-[-.02em] text-gold">26 Oct – 5 Nov</div>
-            <div className="flex items-center gap-3 text-[15px] text-soft">
-              <span>In association with</span>
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2.5 text-[15px] text-soft">
+              <span className="max-sm:basis-full max-sm:text-center">In association with</span>
               <LogoSlot h={40} logo={sponsor.logo_url} />
               <span className="font-bold text-cream">{sponsor.name}</span>
               <span className="rounded-[3px] border border-gold/60 px-2 py-[3px] font-mono text-[11px] uppercase tracking-[.12em] text-gold">Title Sponsor</span>
@@ -77,7 +77,7 @@ export default async function Home() {
           </div>
           <div className="border-b border-cream/[.18]">
             {SCHEDULE.map((d) => (
-              <Link key={d.title} href={d.href} className="-mx-4 flex flex-wrap items-baseline gap-x-8 gap-y-2.5 border-t border-cream/[.18] px-4 py-[26px] text-cream hover:bg-cream/[.06] hover:text-cream">
+              <Link key={d.title} href={d.href} className="flex flex-wrap items-baseline gap-x-8 gap-y-2.5 border-t border-cream/[.18] py-[26px] text-cream hover:bg-cream/[.06] hover:text-cream">
                 <div className="flex basis-[200px] items-baseline gap-3">
                   <span className="font-display text-5xl font-extrabold leading-none text-gold">{d.day}</span>
                   <span className="whitespace-nowrap font-mono text-xs uppercase tracking-[.12em] text-muted">{d.mon} · {d.dow}</span>
@@ -103,7 +103,7 @@ export default async function Home() {
             <div className="flex flex-col gap-5">
               <div className="eyebrow !text-rust">Title Sponsor</div>
               <h2 className="h2">{sponsor.tagline}</h2>
-              {sponsor.link && <a href={sponsor.link} className="inline-flex gap-2 font-bold !text-rust hover:!text-fg">Visit {sponsor.name} <span>↗</span></a>}
+              {sponsor.link && <a href={sponsor.link} className="inline-flex gap-2 py-2 font-bold !text-rust hover:!text-fg">Visit {sponsor.name} <span>↗</span></a>}
             </div>
             {sponsor.logo_url ? (
               // eslint-disable-next-line @next/next/no-img-element

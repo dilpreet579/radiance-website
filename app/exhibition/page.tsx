@@ -10,7 +10,7 @@ export default function Exhibition() {
     <main className="bg-[#0E0A14] text-[#F6E6D0]">
       <section className="relative overflow-hidden pb-[clamp(64px,9vw,120px)] pt-[clamp(56px,9vw,120px)] [background:radial-gradient(ellipse_at_50%_0%,#3B1766_0%,#150D22_58%,#0E0A14_100%)]">
         <div className="absolute right-[-6vw] top-[-14vw] aspect-square w-[min(640px,80vw)] rounded-full opacity-20 [background:repeating-radial-gradient(circle_at_50%_50%,#FF7A1A_0_3px,transparent_3px_28px)]" />
-        <div className="absolute aspect-square w-[calc(min(640px,80vw)*.4)] rounded-full opacity-90 shadow-[0_0_120px_30px_rgba(255,122,26,.35)] [background:radial-gradient(circle,#FF9A3C_0%,#FF7A1A_55%,#C4500A_100%)] [right:calc(-6vw+min(640px,80vw)*.3)] [top:calc(-14vw+min(640px,80vw)*.3)]" />
+        <div className="absolute aspect-square w-[calc(min(640px,80vw)*.4)] rounded-full opacity-90 max-sm:[right:-44px] max-sm:[top:-24px] shadow-[0_0_120px_30px_rgba(255,122,26,.35)] [background:radial-gradient(circle,#FF9A3C_0%,#FF7A1A_55%,#C4500A_100%)] [right:calc(-6vw+min(640px,80vw)*.3)] [top:calc(-14vw+min(640px,80vw)*.3)]" />
         <div className="absolute bottom-[-60px] left-[-10%] h-[200px] w-[70%] blur-[30px] [background:radial-gradient(ellipse,rgba(170,130,230,.28),transparent_70%)]" />
         <div className="absolute bottom-[-80px] right-[-10%] h-[220px] w-[60%] blur-[36px] [background:radial-gradient(ellipse,rgba(170,130,230,.2),transparent_70%)]" />
         <div className="wrap relative flex flex-col gap-[26px]">
@@ -35,7 +35,7 @@ export default function Exhibition() {
           <h2 className="m-0 font-spooky text-[clamp(44px,7vw,84px)] font-normal leading-none tracking-[.03em] text-hw-orange">What&apos;s inside</h2>
           <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]">
             {EX_SECTIONS.map((e) => (
-              <div key={e.n} className="flex min-h-[190px] flex-col gap-2.5 rounded-[10px] border border-[rgba(180,140,235,.35)] p-6 hover:border-hw-orange [background:linear-gradient(160deg,#1E1233,#130C20)]">
+              <div key={e.n} className="flex flex-col gap-2.5 sm:min-h-[190px] rounded-[10px] border border-[rgba(180,140,235,.35)] p-6 hover:border-hw-orange [background:linear-gradient(160deg,#1E1233,#130C20)]">
                 <span className="font-mono text-xs tracking-[.14em] text-hw-orange-2">{e.n}</span>
                 <span className="font-spooky text-[34px] leading-none tracking-[.03em]">{e.t}</span>
                 <span className="text-base text-hw-lilac">{e.d}</span>

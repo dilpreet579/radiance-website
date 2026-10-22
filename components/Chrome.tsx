@@ -32,7 +32,7 @@ export default function Chrome({ children, sponsor }: { children: React.ReactNod
         style={{ background: ex ? "rgba(14,10,20,.92)" : "rgba(46,7,11,.92)" }}
       >
         <div className="wrap flex h-[68px] items-center justify-between gap-6">
-          <Link href="/" className="whitespace-nowrap font-display text-[22px] font-extrabold tracking-[-.01em] text-cream hover:text-cream">
+          <Link href="/" className="whitespace-nowrap py-2.5 font-display text-[22px] font-extrabold tracking-[-.01em] text-cream hover:text-cream">
             Radiance <span className="text-gold">2026</span>
           </Link>
           <nav className="hidden items-center gap-7 min-[1100px]:flex">
@@ -76,16 +76,17 @@ export default function Chrome({ children, sponsor }: { children: React.ReactNod
               <div className="font-display text-[26px] font-extrabold">Radiance <span className="text-gold">2026</span></div>
               <div className="text-[15px] text-muted">3rd edition of NIT Delhi&apos;s Annual Creative Fest, organized by Clairvoyance, the Photography and Film Club of NIT Delhi.</div>
             </div>
-            <div className="flex flex-col gap-2">
+            {/* link rows are padded to a ~42px tap height, so the column has no gap of its own */}
+            <div className="flex flex-col">
               <div className="eyebrow mb-1">Pages</div>
-              {links.map((l) => <Link key={l.href} href={l.href} className="text-[15px] text-cream hover:text-gold">{l.label}</Link>)}
-              <Link href="/register" className="text-[15px] text-cream hover:text-gold">Register</Link>
+              {links.map((l) => <Link key={l.href} href={l.href} className="py-2.5 text-[15px] text-cream hover:text-gold">{l.label}</Link>)}
+              <Link href="/register" className="py-2.5 text-[15px] text-cream hover:text-gold">Register</Link>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col">
               <div className="eyebrow mb-1">Contact</div>
-              <a href={`mailto:${CONTACT.email}`} className="text-[15px] text-muted hover:text-gold">{CONTACT.email}</a>
-              <div className="mt-1.5 flex gap-4 text-[15px] font-semibold">
-                {CONTACT.socials.map(([name, url]) => <a key={name} href={url} target="_blank" rel="noopener noreferrer">{name}</a>)}
+              <a href={`mailto:${CONTACT.email}`} className="py-2.5 text-[15px] text-muted hover:text-gold">{CONTACT.email}</a>
+              <div className="flex gap-5 text-[15px] font-semibold">
+                {CONTACT.socials.map(([name, url]) => <a key={name} href={url} target="_blank" rel="noopener noreferrer" className="py-2.5">{name}</a>)}
               </div>
             </div>
           </div>

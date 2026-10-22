@@ -75,7 +75,7 @@ export default async function Workshops() {
                   </ul>
                 )}
                 {/* link appears once a real URL is set in lib/content.ts */}
-                {w.url && <a href={w.url} target="_blank" rel="noopener noreferrer" className="inline-flex gap-2 text-[15px] font-bold">{w.social} <span>↗</span></a>}
+                {w.url && <a href={w.url} target="_blank" rel="noopener noreferrer" className="inline-flex gap-2 py-2 text-[15px] font-bold">{w.social} <span>↗</span></a>}
               </div>
             </section>
           ))}

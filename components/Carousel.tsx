@@ -32,7 +32,7 @@ export default function Carousel() {
             key={label}
             aria-label={`Go to photo ${k + 1}`}
             onClick={() => setI(k)}
-            className="h-2.5 cursor-pointer rounded-full border-0 p-0 transition-all duration-300"
+            className="relative h-2.5 cursor-pointer rounded-full border-0 p-0 transition-all duration-300 before:absolute before:-inset-x-1 before:-inset-y-3 before:content-['']"
             style={{ width: k === i ? 28 : 10, background: k === i ? "#EBB65B" : "rgba(244,233,217,.3)" }}
           />
         ))}
