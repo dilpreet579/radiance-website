@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
 import { Notes, Placeholder } from "@/components/ui";
 import { WORKSHOPS } from "@/lib/content";
@@ -23,7 +24,24 @@ export default async function Workshops() {
 
           {WORKSHOPS.map((w, i) => (
             <section key={w.n} className="grid items-start gap-[clamp(28px,5vw,72px)] border-t border-cream/20 pt-[clamp(32px,4vw,56px)] [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
-              <Placeholder label={w.photo} className={`aspect-[4/5] max-h-[560px] w-full ${i % 2 ? "min-[700px]:order-2" : ""}`} />
+              {w.photo.startsWith("/") ? (
+                <div className={`relative aspect-[4/5] max-h-[560px] w-full overflow-hidden rounded-lg ${i % 2 ? "min-[700px]:order-2" : ""}`}>
+                  <Image
+                    src={w.photo}
+                    alt={w.speaker}
+                    fill
+                    className="object-cover"
+                    style={{ objectPosition: "center 15%" }}
+                    sizes="(max-width: 700px) 100vw, 50vw"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-5 pb-5 pt-10">
+                    <div className="font-display text-xl font-bold text-white">{w.speaker}</div>
+                    {"role" in w && <div className="font-mono text-xs uppercase tracking-[.12em] text-gold">{(w as { role?: string }).role}</div>}
+                  </div>
+                </div>
+              ) : (
+                <Placeholder label={w.photo} className={`aspect-[4/5] max-h-[560px] w-full ${i % 2 ? "min-[700px]:order-2" : ""}`} />
+              )}
               <div className="flex flex-col gap-5">
                 <div className="font-mono text-[13px] uppercase tracking-[.14em] text-gold">Workshop {w.n} · {w.date}</div>
                 <h2 className="m-0 text-balance font-display text-[clamp(34px,4.6vw,60px)] font-extrabold leading-none tracking-[-.02em]">{w.title}</h2>
@@ -37,6 +55,7 @@ export default async function Workshops() {
                 </div>
                 <div>
                   <div className="font-display text-[22px] font-bold">{w.speaker}</div>
+                  {"role" in w && <div className="mb-1 font-mono text-xs uppercase tracking-[.12em] text-gold">{(w as { role?: string }).role}</div>}
                   <p className="mb-0 mt-1.5 text-pretty text-soft">{w.bio}</p>
                 </div>
                 {w.points.length > 0 && (
