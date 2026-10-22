@@ -181,7 +181,7 @@ function TicketView({ ticket: t, dup, emailed, again }: { ticket: Ticket; dup: b
           </div>
         )}
         <div className="flex items-center gap-3 bg-bg px-[26px] py-3 font-mono text-[11px] uppercase tracking-[.12em] text-cream">
-          <span>Title Sponsor</span><LogoSlot w={44} h={18} /><span>Bharat Petroleum</span>
+          <span>Title Sponsor</span><LogoSlot w={44} h={18} logo={t.sponsor.logo_url} /><span>{t.sponsor.name}</span>
         </div>
       </div>
       <div className="flex max-w-[520px] basis-80 flex-1 flex-col gap-[22px]">

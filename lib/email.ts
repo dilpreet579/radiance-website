@@ -5,10 +5,16 @@ export const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localh
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 
-const FOOTER = `<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e5d6c0;font-size:12px;color:#6b3a33">Title Sponsor: Bharat Petroleum · Radiance 2026, NIT Delhi</div>`;
+export type SponsorInfo = { name: string; logo_url: string };
 
-const shell = (inner: string) =>
-  `<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#f4e9d9;color:#2a0b0c">${inner}${FOOTER}</div>`;
+// Dark strip like the on-screen ticket's footer; logo shown only when one is uploaded.
+const footer = (s: SponsorInfo) =>
+  `<div style="margin-top:24px;background:#2e070b;color:#f4e9d9;border-radius:8px;padding:12px 16px;font-size:12px;letter-spacing:.08em;text-transform:uppercase">Title Sponsor ${
+    s.logo_url ? `<img src="${esc(s.logo_url)}" alt="" height="22" style="height:22px;vertical-align:middle;margin:0 8px">` : "· "
+  }<b>${esc(s.name)}</b> · Radiance 2026, NIT Delhi</div>`;
+
+const shell = (inner: string, s: SponsorInfo) =>
+  `<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#f4e9d9;color:#2a0b0c">${inner}${footer(s)}</div>`;
 
 export async function sendMail(to: string, subject: string, html: string) {
   const key = process.env.RESEND_API_KEY;
@@ -17,7 +23,7 @@ export async function sendMail(to: string, subject: string, html: string) {
   if (error) throw new Error(error.message);
 }
 
-export type TicketInfo = { token: string; name: string; type: string; institute: string; roll: string; workshops: string[] };
+export type TicketInfo = { token: string; name: string; type: string; institute: string; roll: string; workshops: string[]; sponsor: SponsorInfo };
 
 export function sendTicket(to: string, t: TicketInfo, dup = false) {
   const ws = t.workshops.length ? `<p style="margin:8px 0"><b>Workshops:</b> ${t.workshops.map(esc).join(", ")}</p>` : "";
@@ -35,7 +41,7 @@ export function sendTicket(to: string, t: TicketInfo, dup = false) {
         <div style="font-family:monospace;font-size:20px;letter-spacing:.04em">${esc(t.token)}</div>
       </div>
       ${ws}
-      <p style="font-size:14px">Take a screenshot of this ticket or keep this email handy; you'll need to show the QR / token at every event.</p>`),
+      <p style="font-size:14px">Take a screenshot of this ticket or keep this email handy; you'll need to show the QR / token at every event.</p>`, t.sponsor),
   );
 }
 
@@ -43,5 +49,5 @@ export function fillTemplate(tpl: string, v: Record<string, string>) {
   return tpl.replace(/\{(\w+)\}/g, (m, k) => v[k] ?? m);
 }
 
-export const reminderHtml = (body: string) =>
-  shell(body.split("\n").map((l) => (l.trim() ? `<p style="margin:0 0 12px">${esc(l)}</p>` : "")).join(""));
+export const reminderHtml = (body: string, s: SponsorInfo) =>
+  shell(body.split("\n").map((l) => (l.trim() ? `<p style="margin:0 0 12px">${esc(l)}</p>` : "")).join(""), s);

@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { db } from "@/lib/db";
 import { sendTicket } from "@/lib/email";
 import { getSettings } from "@/lib/settings";
+import { getTitleSponsor } from "@/lib/sponsors";
 import { WORKSHOP_OPTIONS } from "@/lib/content";
 
 export type RegInput = {
@@ -11,7 +12,7 @@ export type RegInput = {
   year: string; branch: string; phone: string; email: string;
   workshops: string[]; consents: Record<string, boolean>;
 };
-export type Ticket = { token: string; name: string; type: string; institute: string; roll: string; email: string; workshops: string[]; qrPath: string; qrBox: number };
+export type Ticket = { token: string; name: string; type: string; institute: string; roll: string; email: string; workshops: string[]; qrPath: string; qrBox: number; sponsor: { name: string; logo_url: string } };
 export type RegResult =
   | { ok: true; dup: boolean; ticket: Ticket; emailed: boolean }
   | { ok: false; errors: Record<string, string> };
@@ -48,6 +49,7 @@ export async function register(i: RegInput): Promise<RegResult> {
     return { ok: false, errors: { ws: `${WS_NAME[data.workshop] ?? "A workshop"} is now full. Please deselect it.` } };
   }
 
+  const sponsor = await getTitleSponsor();
   const r = data.reg as { token: string; name: string; is_nit: boolean; institute: string; roll: string; email: string; workshops: string[] };
   const qr = QRCode.create(r.token, { errorCorrectionLevel: "M" });
   const n = qr.modules.size;
@@ -57,6 +59,7 @@ export async function register(i: RegInput): Promise<RegResult> {
   const ticket: Ticket = {
     token: r.token, name: r.name, type: r.is_nit ? "Universal Pass" : "Workshop Pass", institute: r.institute,
     roll: r.roll, email: r.email, workshops: r.workshops.map((w) => WS_NAME[w] ?? w), qrPath, qrBox: n,
+    sponsor: { name: sponsor.name, logo_url: sponsor.logo_url },
   };
   let emailed = true;
   try {
