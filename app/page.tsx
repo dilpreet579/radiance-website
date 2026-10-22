@@ -43,7 +43,7 @@ export default async function Home() {
         <div className="wrap grid [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))]">
           {STATS.map((s) => (
             <div key={s.l} className="flex flex-col gap-1.5 border-l border-fg/[.18] px-[clamp(0px,2vw,28px)] py-[clamp(32px,5vw,56px)]">
-              <div className="font-display text-[clamp(56px,8vw,104px)] font-extrabold leading-[.95] tracking-[-.03em] text-rust">{s.n}</div>
+              <div className="font-display text-[clamp(56px,8vw,104px)] font-extrabold leading-[.95] tracking-[-.03em] text-[#430b10]">{s.n}</div>
               <div className="text-[17px] font-semibold text-fg-2">{s.l}</div>
             </div>
           ))}

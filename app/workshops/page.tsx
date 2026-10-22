@@ -31,7 +31,7 @@ export default async function Workshops() {
                     alt={w.speaker}
                     fill
                     className="object-cover"
-                    style={{ objectPosition: "center 15%" }}
+                    style={{ objectPosition: "center 40%" }}
                     sizes="(max-width: 700px) 100vw, 50vw"
                   />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-5 pb-5 pt-10">
@@ -45,7 +45,7 @@ export default async function Workshops() {
               <div className="flex flex-col gap-5">
                 <div className="font-mono text-[13px] uppercase tracking-[.14em] text-gold">Workshop {w.n} · {w.date}</div>
                 <h2 className="m-0 text-balance font-display text-[clamp(34px,4.6vw,60px)] font-extrabold leading-none tracking-[-.02em]">{w.title}</h2>
-                <div className="text-[19px] font-semibold">{w.by}</div>
+                
                 <div className="flex flex-wrap gap-2">
                   {[w.time, "NIT Delhi + outside (limited)"].map((c) => <span key={c} className="chip !px-3.5 !py-1.5">{c}</span>)}
                 </div>
