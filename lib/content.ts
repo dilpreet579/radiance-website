@@ -105,7 +105,7 @@ export const WORKSHOPS = [
 ];
 
 export const INAUG_STEPS = [
-  { n: "01", t: "Inaugration by Dignitaries", d: "Inaugration of the workshop done by our esteemed dignitaries along with there speeches." },
+  { n: "01", t: "Inauguration by Dignitaries", d: "Inauguration of the festival by our esteemed dignitaries, along with their speeches." },
   { n: "02", t: "Format and Lineup of Radiance", d: "Format of radiance explained along with its 8 days events, activities planned and major rules." },
   { n: "03", t: "Stand-up comedy by Vaibhav Karn", d: "The evening closes with a comedy show." },
 ];

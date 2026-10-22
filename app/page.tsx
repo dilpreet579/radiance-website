@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Carousel from "@/components/Carousel";
 import { LogoSlot, Notes, RegisterBtn } from "@/components/ui";
-import { COLLABS, DISCIPLINES, NOTES, SCHEDULE, SPEAKERS, STATS } from "@/lib/content";
+import { COLLABS, DISCIPLINES, SCHEDULE, SPEAKERS, STATS } from "@/lib/content";
 import { EVENT_LD } from "@/lib/seo";
 import { getSettings } from "@/lib/settings";
 import { getAssociateSponsors, getTitleSponsor } from "@/lib/sponsors";
@@ -91,7 +91,7 @@ export default async function Home() {
               </Link>
             ))}
           </div>
-          <div className="mt-7"><Notes items={NOTES} /></div>
+          <div className="mt-7"><Notes items={notes} /></div>
         </div>
       </section>
 

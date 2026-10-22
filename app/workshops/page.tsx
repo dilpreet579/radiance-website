@@ -10,8 +10,7 @@ export const revalidate = 60;
 export const metadata = pageMeta("/workshops");
 
 export default async function Workshops() {
-  const { seat_cap } = await getSettings();
-  const { NOTES } = await import("@/lib/content");
+  const { notes, seat_cap } = await getSettings();
   return (
     <>
       <PageHeader path="/workshops" />
@@ -97,7 +96,7 @@ export default async function Workshops() {
             </section>
           ))}
 
-          <div className="border-t border-cream/20 pt-7"><Notes items={NOTES} /></div>
+          <div className="border-t border-cream/20 pt-7"><Notes items={notes} /></div>
         </div>
       </main>
     </>
