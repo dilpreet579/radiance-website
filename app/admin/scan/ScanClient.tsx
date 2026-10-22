@@ -124,7 +124,10 @@ export default function ScanClient({ email, isSuper, sessions, checkpoints, sign
         )}
 
         <div className="relative grid aspect-[4/3] max-h-60 w-full place-items-center overflow-hidden border border-cream/25 [background:repeating-linear-gradient(135deg,rgba(244,233,217,.08)_0_14px,rgba(244,233,217,.02)_14px_28px)]">
-          <div id="reader" className={`absolute inset-0 [&_video]:h-full [&_video]:w-full [&_video]:object-cover ${on ? "" : "hidden"}`} />
+          {/* html5-qrcode overwrites #reader's inline style (position: relative), so sizing lives on this wrapper */}
+          <div className={`absolute inset-0 [&_video]:h-full [&_video]:w-full [&_video]:object-cover ${on ? "" : "hidden"}`}>
+            <div id="reader" className="h-full w-full" />
+          </div>
           <span className={`${corner} left-[18px] top-[18px] border-l-4 border-t-4`} />
           <span className={`${corner} right-[18px] top-[18px] border-r-4 border-t-4`} />
           <span className={`${corner} bottom-[18px] left-[18px] border-b-4 border-l-4`} />
