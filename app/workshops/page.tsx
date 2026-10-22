@@ -49,9 +49,20 @@ export default async function Workshops() {
                 <div className="flex flex-wrap gap-2">
                   {[w.time, "NIT Delhi + outside (limited)"].map((c) => <span key={c} className="chip !px-3.5 !py-1.5">{c}</span>)}
                 </div>
-                <div className="flex items-baseline gap-3.5 border-y border-cream/20 py-[18px]">
-                  <span className="font-display text-[clamp(40px,5vw,60px)] font-extrabold leading-none tracking-[-.02em] text-gold">{w.big}</span>
-                  <span className="text-[15px] text-muted">{w.bigLabel}</span>
+                <div className="flex items-center gap-4 border-y border-cream/20 py-[18px]">
+                  <span className="font-display text-[clamp(28px,4vw,44px)] font-extrabold leading-none tracking-[-.02em] text-gold">{w.big}</span>
+                  {"bigLogo" in w && (w as { bigLogo?: string }).bigLogo ? (
+                    <div className="relative h-10 w-28 overflow-hidden rounded-md shadow-md">
+                      <Image
+                        src={(w as { bigLogo: string }).bigLogo}
+                        alt="Nikon Logo"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <span className="text-[15px] text-muted">{w.bigLabel}</span>
+                  )}
                 </div>
                 <div>
                   <div className="font-display text-[22px] font-bold">{w.speaker}</div>
