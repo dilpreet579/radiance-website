@@ -69,8 +69,8 @@ export default function ScanClient({ email, isSuper, sessions, checkpoints, sign
     let q: import("html5-qrcode").Html5Qrcode | undefined;
     const started = (async () => {
       const { Html5Qrcode } = await import("html5-qrcode");
-      q = new Html5Qrcode("reader");
-      await q.start({ facingMode: "environment" }, { fps: 8, qrbox: 200 }, (text) => {
+      q = new Html5Qrcode("reader", { verbose: false, experimentalFeatures: { useBarCodeDetectorIfSupported: true } }); // native decoder where available, JS fallback otherwise
+      await q.start({ facingMode: "environment" }, { fps: 15, qrbox: (w, h) => { const s = Math.floor(Math.min(w, h) * 0.8); return { width: s, height: s }; } }, (text) => {
         const now = Date.now();
         if (text === last.current.t && now - last.current.at < 3000) return; // camera re-reads the same code
         last.current = { t: text, at: now };
