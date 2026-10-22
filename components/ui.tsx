@@ -35,7 +35,7 @@ export function Notes({ items }: { items: { k: string; t: string }[] }) {
     <div className="grid gap-x-10 gap-y-4 [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]">
       {items.map((n) => (
         <div key={n.k} className="text-[15px] text-muted">
-          <span className="mr-2.5 font-mono text-xs uppercase tracking-[.12em] text-gold">{n.k}</span>
+          <span className="mb-0.5 block font-mono text-xs uppercase tracking-[.12em] text-gold sm:mb-0 sm:mr-2.5 sm:inline">{n.k}</span>
           {n.t}
         </div>
       ))}

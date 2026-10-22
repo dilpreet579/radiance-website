@@ -21,7 +21,7 @@ export default async function Inaugural() {
               <div className="eyebrow mb-2">What happens</div>
               {INAUG_STEPS.map((s) => (
                 <div key={s.n} className="flex gap-[22px] border-t border-cream/20 py-[22px]">
-                  <span className="basis-14 font-display text-[40px] font-extrabold leading-none text-gold">{s.n}</span>
+                  <span className="w-16 shrink-0 font-display text-[40px] font-extrabold leading-none text-gold">{s.n}</span>
                   <div>
                     <div className="font-display text-[26px] font-bold leading-[1.15]">{s.t}</div>
                     <div className="mt-1 text-muted">{s.d}</div>

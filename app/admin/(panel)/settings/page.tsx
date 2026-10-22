@@ -29,15 +29,15 @@ export default async function Page() {
   const note = (k: string) => s.notes.find((n) => n.k === k)?.t ?? "";
   return (
     <>
-      <PageTitle title="Settings" sub="Seat caps, venue text, notes shown on the website and consent wording."
+      <PageTitle title="Settings" sub="Seat caps, inaugural venue, notes shown on the website and consent wording."
         actions={<button form="settings-form" className={btnP}>Save changes</button>} />
       <AForm id="settings-form" action={save} messages={{ save: "Settings saved" }}>
         <CardGrid>
           <Card>
-            <CardHead title="Seats and venue" />
+            <CardHead title="Seats and inaugural venue" />
             <FieldGrid>
               <Field label="Outside seats per workshop"><input name="seat_cap" type="number" min={0} defaultValue={s.seat_cap} className={input} /></Field>
-              <Field label="Default venue text"><input name="venue" defaultValue={s.venue} className={input} /></Field>
+              <Field label="Inaugural venue" hint="Shown on the Inaugural page only. Reminder emails use their own venue, set under Reminders."><input name="venue" defaultValue={s.venue} className={input} /></Field>
             </FieldGrid>
           </Card>
           <Card>

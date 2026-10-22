@@ -91,10 +91,11 @@ export default function RegisterForm({ seatsLeft, seatCap, consents }: { seatsLe
               const left = seatsLeft[w.key] ?? seatCap, full = left <= 0, on = ws.includes(w.key);
               return (
                 <div key={w.key} onClick={() => { if (full) return; setWs(on ? ws.filter((x) => x !== w.key) : [...ws, w.key]); clear("ws"); }}
-                  className={`flex items-center gap-3.5 rounded-lg border-[1.5px] p-3.5 ${on ? "border-panel" : "border-fg/20"} ${full ? "cursor-not-allowed bg-fg/[.06] opacity-65" : "cursor-pointer bg-cream-2"}`}>
+                  className={`flex flex-wrap items-center gap-x-3.5 gap-y-1.5 rounded-lg border-[1.5px] p-3.5 ${on ? "border-panel" : "border-fg/20"} ${full ? "cursor-not-allowed bg-fg/[.06] opacity-65" : "cursor-pointer bg-cream-2"}`}>
                   <Box on={on} />
-                  <span className="flex flex-1 flex-col"><span className="text-[17px] font-bold">{w.name}</span><span className="text-sm text-fg-3">{w.d}</span></span>
-                  <span className={`whitespace-nowrap font-mono text-xs uppercase tracking-[.08em] ${full ? "font-bold text-err" : "text-fg-3"}`}>{full ? "Seats full" : `${left} seats left`}</span>
+                  <span className="flex min-w-[140px] flex-1 flex-col"><span className="text-[17px] font-bold">{w.name}</span><span className="text-sm text-fg-3">{w.d}</span></span>
+                  {/* on phones the seat count drops under the text (38px = checkbox 24 + gap 14) instead of squeezing the title */}
+                  <span className={`whitespace-nowrap font-mono text-xs uppercase tracking-[.08em] max-sm:basis-full max-sm:pl-[38px] ${full ? "font-bold text-err" : "text-fg-3"}`}>{full ? "Seats full" : `${left} seats left`}</span>
                 </div>
               );
             })}
