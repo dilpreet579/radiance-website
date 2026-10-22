@@ -74,9 +74,9 @@ export default function RegisterForm({ seatsLeft, seatCap, consents }: { seatsLe
       <div className="flex min-w-0 basis-[520px] flex-1 flex-col gap-[26px] rounded-[10px] bg-cream p-[clamp(22px,3.4vw,44px)] text-fg">
         <div className="grid gap-x-5 gap-y-[22px] [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))]">
           {field("name", "Full name")}
-          {field("email", "Email ID", { type: "email", hint: nit ? "NIT Delhi emails end with @nitdelhi.ac.in" : "" })}
+          {field("email", "Email ID", { type: "email" })}
           {field("phone", "Phone number", { type: "tel" })}
-          {field("roll", "Roll number", { hint: nit ? "NIT Delhi roll numbers start with 2" : "" })}
+          {field("roll", "Roll number")}
           {field("gender", "Gender", { wide: true, children: chips("gender", ["Male", "Female", "Other", "Prefer not to say"]) })}
           {field("inst", "Institute", { wide: true, children: chips("inst", ["NIT Delhi", "Other"]) })}
           {!nit && field("instName", "Institute name", { wide: true })}
