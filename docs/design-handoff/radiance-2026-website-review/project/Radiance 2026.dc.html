@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;family=Creepster&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+html,body{margin:0;background:#2E070B}
+*{box-sizing:border-box}
+a{color:#EBB65B;text-decoration:none}
+a:hover{color:#F4E9D9}
+button,input{font-family:inherit}
+::selection{background:#EBB65B;color:#2E070B}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:{{ rootBg }};color:#F4E9D9;font-family:'Hanken Grotesk',sans-serif;font-size:17px;line-height:1.6">
+
+<div style="background:#1E0407;border-bottom:1px solid rgba(244,233,217,.1)">
+  <div style="max-width:1200px;margin:0 auto;padding:8px clamp(20px,5vw,64px);display:flex;align-items:center;justify-content:center;gap:12px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#D9C3B0">
+    <span>Title Sponsor</span>
+    <span style="width:56px;height:22px;border:1px dashed rgba(244,233,217,.45);background:repeating-linear-gradient(135deg,rgba(244,233,217,.16) 0 6px,transparent 6px 12px)"></span>
+    <span style="color:#F4E9D9">Bharat Petroleum</span>
+  </div>
+</div>
+
+<header style="position:sticky;top:0;z-index:50;background:{{ navBg }};border-bottom:1px solid rgba(244,233,217,.14);backdrop-filter:blur(10px)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);height:68px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+    <a href="#/home" style="display:flex;align-items:center;gap:12px;color:#F4E9D9">
+      
+      <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;letter-spacing:-.01em;white-space:nowrap">Radiance <span style="color:#EBB65B">2026</span></span>
+    </a>
+    <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+      <nav style="display:flex;align-items:center;gap:28px">
+        <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="6">
+          <a href="{{ l.href }}" style="font-size:15px;font-weight:600;padding:8px 0;white-space:nowrap;border-bottom:2px solid {{ l.line }};color:{{ l.color }}">{{ l.label }}</a>
+        </sc-for>
+        <a href="#/register" style="background:#EBB65B;color:#2E070B;font-weight:700;font-size:15px;padding:10px 20px;border-radius:999px" style-hover="background:#F4E9D9;color:#2E070B">Register</a>
+      </nav>
+    </sc-if>
+    <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ toggleMenu }}" style="background:transparent;border:1.5px solid rgba(244,233,217,.4);color:#F4E9D9;border-radius:999px;padding:9px 18px;font-size:14px;font-weight:600;cursor:pointer">{{ menuLabel }}</button>
+    </sc-if>
+  </div>
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:4px clamp(20px,5vw,64px) 20px;display:flex;flex-direction:column;border-top:1px solid rgba(244,233,217,.14)">
+      <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="6">
+        <a href="{{ l.href }}" style="font-size:18px;font-weight:600;padding:14px 0;border-bottom:1px solid rgba(244,233,217,.12);color:{{ l.color }}">{{ l.label }}</a>
+      </sc-for>
+      <a href="#/register" style="margin-top:18px;background:#EBB65B;color:#2E070B;font-weight:700;font-size:16px;padding:14px 20px;border-radius:999px;text-align:center">Register</a>
+    </div>
+  </sc-if>
+</header>
+
+<sc-if value="{{ showHeader }}" hint-placeholder-val="{{ false }}">
+<section style="background:url(assets/pattern.jpg) center/cover,#430B10;padding:clamp(48px,7vw,88px) 0 clamp(40px,6vw,72px);border-bottom:1px solid rgba(244,233,217,.12)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;gap:22px">
+    <div style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">{{ meta.eyebrow }}</div>
+    <h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(44px,7vw,92px);line-height:.96;letter-spacing:-.025em;max-width:960px;text-wrap:balance">{{ meta.title }}</h1>
+    <p style="margin:0;font-size:clamp(18px,2vw,21px);max-width:660px;color:#E8D6C4;text-wrap:pretty">{{ meta.lead }}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">
+      <sc-for list="{{ meta.chips }}" as="c" hint-placeholder-count="3">
+        <span style="border:1px solid rgba(244,233,217,.35);border-radius:999px;padding:7px 16px;font-size:14px;font-weight:600;background:rgba(30,4,7,.35)">{{ c }}</span>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</sc-if>
+
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<main>
+<section style="background:url(assets/pattern.jpg) center/cover,#430B10;padding:clamp(40px,6vw,80px) 0 clamp(56px,8vw,104px)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;align-items:center;gap:clamp(28px,4vw,44px);text-align:center">
+    <div style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">3rd edition · NIT Delhi Annual Creative Fest</div>
+    <div style="background:#F4E9D9;border-radius:6px;padding:clamp(8px,2vw,28px);box-shadow:clamp(6px,1vw,12px) clamp(6px,1vw,12px) 0 #1E0407;width:min(980px,100%)">
+      <div style="aspect-ratio:2172/510;overflow:hidden"><img src="assets/radiance26-logo.png" alt="Radiance 2026 NIT Delhi, Clairvoyance presents" style="width:100%;display:block;margin-top:-3.2%"></div>
+    </div>
+    <p style="margin:0;font-size:clamp(19px,2.2vw,24px);max-width:700px;text-wrap:balance">Hands-on sessions with industry creators across photography, filmmaking, motion design and graphic design.</p>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px 44px">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(34px,5vw,56px);letter-spacing:-.02em;color:#EBB65B;line-height:1">26 Oct – 5 Nov</div>
+      <div style="display:flex;align-items:center;gap:12px;font-size:15px;color:#E8D6C4">
+        <span>In association with</span>
+        <span style="width:56px;height:24px;border:1px dashed rgba(244,233,217,.5);background:repeating-linear-gradient(135deg,rgba(244,233,217,.16) 0 6px,transparent 6px 12px)"></span>
+        <span style="color:#F4E9D9;font-weight:700">Bharat Petroleum</span>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(235,182,91,.6);color:#EBB65B;padding:3px 8px;border-radius:3px">Title Sponsor</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px">
+      <a href="#/register" style="display:inline-flex;align-items:center;gap:10px;background:#EBB65B;color:#2E070B;font-weight:700;font-size:17px;padding:16px 30px;border-radius:999px" style-hover="background:#F4E9D9;color:#2E070B">Register now <span>→</span></a>
+      <a href="#/competitions" style="display:inline-flex;align-items:center;gap:10px;border:1.5px solid rgba(244,233,217,.55);color:#F4E9D9;font-weight:700;font-size:17px;padding:16px 30px;border-radius:999px" style-hover="background:rgba(244,233,217,.12);color:#F4E9D9">Competitions on Unstop <span>↗</span></a>
+    </div>
+  </div>
+</section>
+
+<section style="background:#F4E9D9;color:#2A0B0C">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+    <sc-for list="{{ stats }}" as="st" hint-placeholder-count="3">
+      <div style="padding:clamp(32px,5vw,56px) clamp(0px,2vw,28px);border-left:1px solid rgba(42,11,12,.18);display:flex;flex-direction:column;gap:6px">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(56px,8vw,104px);line-height:.95;letter-spacing:-.03em;color:#A82E17">{{ st.n }}</div>
+        <div style="font-size:17px;font-weight:600;color:#4A1E1A">{{ st.l }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="background:#430B10;padding:clamp(56px,8vw,112px) 0">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(32px,5vw,80px)">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">About</div>
+      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4.6vw,58px);line-height:1;letter-spacing:-.02em;text-wrap:balance">An 8-day creative learning festival</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <p style="margin:0;font-size:19px;text-wrap:pretty">Radiance is envisioned as an 8-day creative learning festival designed to provide students with practical and experiential exposure to diverse domains of visual storytelling, including Photography, Filmmaking, Video Editing and Graphic Design.</p>
+      <p style="margin:0;color:#D9C3B0;text-wrap:pretty">Organized by Clairvoyance, the Photography and Film Club of NIT Delhi. The festival features an inaugural session, expert-led workshops, creative competitions, a photo walk and a themed grand exhibition.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <sc-for list="{{ disciplines }}" as="d" hint-placeholder-count="4">
+          <span style="border:1px solid rgba(235,182,91,.55);color:#EBB65B;border-radius:999px;padding:7px 16px;font-size:14px;font-weight:600">{{ d }}</span>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#430B10;padding:0 0 clamp(56px,8vw,112px)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px)">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:36px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">Schedule</div>
+        <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4.6vw,58px);line-height:1;letter-spacing:-.02em">26 Oct to 5 Nov</h2>
+      </div>
+      <a href="#/register" style="display:inline-flex;align-items:center;gap:10px;background:#EBB65B;color:#2E070B;font-weight:700;font-size:16px;padding:14px 26px;border-radius:999px" style-hover="background:#F4E9D9;color:#2E070B">Register <span>→</span></a>
+    </div>
+    <div style="border-bottom:1px solid rgba(244,233,217,.18)">
+      <sc-for list="{{ schedule }}" as="d" hint-placeholder-count="8">
+        <a href="{{ d.href }}" style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 32px;padding:26px 16px;margin:0 -16px;border-top:1px solid rgba(244,233,217,.18);color:#F4E9D9" style-hover="background:rgba(244,233,217,.06);color:#F4E9D9">
+          <div style="flex:0 0 150px;display:flex;align-items:baseline;gap:12px">
+            <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:48px;line-height:1;color:#EBB65B">{{ d.day }}</span>
+            <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#D9C3B0">{{ d.mon }} · {{ d.dow }}</span>
+          </div>
+          <div style="flex:1 1 320px">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(21px,2.4vw,28px);line-height:1.15">{{ d.title }}</div>
+            <div style="font-size:15px;color:#D9C3B0;margin-top:4px">{{ d.sub }}</div>
+          </div>
+          <div style="flex:0 1 270px;display:flex;flex-direction:column;gap:2px;font-size:15px">
+            <span style="font-weight:700">{{ d.time }}</span>
+            <span style="color:#D9C3B0">{{ d.who }}</span>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px 40px;margin-top:28px">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="2">
+        <div style="font-size:15px;color:#D9C3B0"><span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#EBB65B;margin-right:10px">{{ n.k }}</span>{{ n.t }}</div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section style="background:#F4E9D9;color:#2A0B0C;padding:clamp(56px,8vw,112px) 0">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;gap:clamp(48px,7vw,88px)">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,5vw,72px);align-items:center">
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#A82E17">Title Sponsor</div>
+        <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4.6vw,58px);line-height:1;letter-spacing:-.02em;text-wrap:balance">Radiance 2026 is proudly presented by Bharat Petroleum</h2>
+        <a href="https://www.bharatpetroleum.in" style="font-weight:700;color:#A82E17;display:inline-flex;gap:8px" style-hover="color:#2A0B0C">Visit Bharat Petroleum <span>↗</span></a>
+      </div>
+      <div style="aspect-ratio:16/9;border:1.5px dashed rgba(168,46,23,.55);background:repeating-linear-gradient(135deg,rgba(168,46,23,.1) 0 12px,rgba(168,46,23,.03) 12px 24px);display:grid;place-items:center;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8A2210;text-align:center;padding:16px">Bharat Petroleum logo<br>high-res file to be supplied</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:22px;border-top:1px solid rgba(42,11,12,.2);padding-top:clamp(32px,4vw,48px)">
+      <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#A82E17">Past collaborators</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px">
+        <sc-for list="{{ collabs }}" as="c" hint-placeholder-count="5">
+          <div style="border:1.5px dashed rgba(168,46,23,.45);background:repeating-linear-gradient(135deg,rgba(168,46,23,.07) 0 10px,transparent 10px 20px);min-height:104px;padding:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center">
+            <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;line-height:1.15">{{ c.n }}</span>
+            <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#8A2210">{{ c.s }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#2E070B;padding:clamp(56px,8vw,112px) 0">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;gap:32px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">Radiance 2025</div>
+        <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4.6vw,58px);line-height:1;letter-spacing:-.02em">Last year in photographs</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.1em;color:#D9C3B0;margin-right:6px">{{ slideCounter }}</span>
+        <button onClick="{{ prev }}" aria-label="Previous photo" style="width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(244,233,217,.5);background:transparent;color:#F4E9D9;font-size:20px;cursor:pointer" style-hover="background:#EBB65B;color:#2E070B">←</button>
+        <button onClick="{{ next }}" aria-label="Next photo" style="width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(244,233,217,.5);background:transparent;color:#F4E9D9;font-size:20px;cursor:pointer" style-hover="background:#EBB65B;color:#2E070B">→</button>
+      </div>
+    </div>
+    <div style="overflow:hidden;border-radius:4px">
+      <div style="display:flex;transition:transform .6s cubic-bezier(.2,.7,.2,1);transform:translateX({{ slideX }})">
+        <sc-for list="{{ slides }}" as="s" hint-placeholder-count="5">
+          <div style="flex:0 0 100%;aspect-ratio:16/9;max-height:640px;border:1px solid rgba(244,233,217,.25);background:repeating-linear-gradient(135deg,rgba(244,233,217,.1) 0 14px,rgba(244,233,217,.03) 14px 28px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:20px">
+            <span style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#F4E9D9">Radiance 2025 · {{ s.label }}</span>
+            <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#D9C3B0">placeholder photo</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <sc-for list="{{ dots }}" as="d" hint-placeholder-count="5">
+        <button onClick="{{ d.go }}" aria-label="{{ d.label }}" style="{{ d.style }}"></button>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section style="background:url(assets/pattern.jpg) center/cover,#430B10;padding:clamp(56px,8vw,112px) 0">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;gap:28px">
+    <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">Past speakers</div>
+    <div>
+      <sc-for list="{{ speakers }}" as="sp" hint-placeholder-count="5">
+        <div style="display:flex;align-items:baseline;gap:24px;padding:clamp(14px,2vw,22px) 0;border-top:1px solid rgba(244,233,217,.2)">
+          <span style="font-family:'DM Mono',monospace;font-size:13px;color:#EBB65B;flex:0 0 28px">{{ sp.i }}</span>
+          <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(30px,5.4vw,68px);line-height:1.02;letter-spacing:-.025em">{{ sp.n }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</main>
+</sc-if>
+
+<sc-if value="{{ isWorkshops }}" hint-placeholder-val="{{ false }}">
+<main style="background:#430B10;padding:clamp(40px,6vw,80px) 0 clamp(56px,8vw,112px)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;gap:clamp(48px,7vw,96px)">
+    <div style="background:#F4E9D9;color:#2A0B0C;border-radius:8px;padding:clamp(22px,3vw,34px);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px">
+      <div style="flex:1 1 380px;display:flex;flex-direction:column;gap:6px">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;line-height:1.15">One registration covers every workshop</div>
+        <div style="font-size:16px;color:#4A1E1A">NIT Delhi students get the Universal Pass. Outside students pick their workshops on the registration page, 15 seats per workshop.</div>
+      </div>
+      <a href="#/register" style="display:inline-flex;align-items:center;gap:10px;background:#A82E17;color:#F4E9D9;font-weight:700;font-size:16px;padding:14px 26px;border-radius:999px" style-hover="background:#2A0B0C;color:#F4E9D9">Go to registration <span>→</span></a>
+    </div>
+    <sc-for list="{{ workshops }}" as="w" hint-placeholder-count="4">
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,5vw,72px);align-items:start;border-top:1px solid rgba(244,233,217,.2);padding-top:clamp(32px,4vw,56px)">
+        <div style="order:{{ w.order }};aspect-ratio:4/5;max-height:560px;width:100%;border:1px solid rgba(244,233,217,.25);background:repeating-linear-gradient(135deg,rgba(244,233,217,.1) 0 14px,rgba(244,233,217,.03) 14px 28px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:20px">
+          <span style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase">{{ w.photo }}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#D9C3B0">placeholder photo</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">Workshop {{ w.n }} · {{ w.date }}</div>
+          <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(34px,4.6vw,60px);line-height:1;letter-spacing:-.02em;text-wrap:balance">{{ w.title }}</h2>
+          <div style="font-size:19px;font-weight:600">{{ w.by }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ w.chips }}" as="c" hint-placeholder-count="2">
+              <span style="border:1px solid rgba(244,233,217,.35);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;background:rgba(30,4,7,.35)">{{ c }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:14px;padding:18px 0;border-top:1px solid rgba(244,233,217,.2);border-bottom:1px solid rgba(244,233,217,.2)">
+            <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(40px,5vw,60px);line-height:1;color:#EBB65B;letter-spacing:-.02em">{{ w.big }}</span>
+            <span style="font-size:15px;color:#D9C3B0">{{ w.bigLabel }}</span>
+          </div>
+          <div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:22px">{{ w.speaker }}</div>
+            <p style="margin:6px 0 0;color:#E8D6C4;text-wrap:pretty">{{ w.bio }}</p>
+          </div>
+          <sc-if value="{{ w.hasPoints }}" hint-placeholder-val="{{ false }}">
+            <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ w.points }}" as="p" hint-placeholder-count="2">
+                <li style="display:flex;gap:12px;font-size:16px"><span style="color:#EBB65B">→</span><span>{{ p }}</span></li>
+              </sc-for>
+            </ul>
+          </sc-if>
+          <a href="#" style="font-weight:700;display:inline-flex;gap:8px;font-size:15px">{{ w.social }} <span>↗</span></a>
+        </div>
+      </section>
+    </sc-for>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px 40px;border-top:1px solid rgba(244,233,217,.2);padding-top:28px">
+      <sc-for list="{{ notes }}" as="n" hint-placeholder-count="2">
+        <div style="font-size:15px;color:#D9C3B0"><span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#EBB65B;margin-right:10px">{{ n.k }}</span>{{ n.t }}</div>
+      </sc-for>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isInaugural }}" hint-placeholder-val="{{ false }}">
+<main style="background:#430B10;padding:clamp(40px,6vw,80px) 0 clamp(56px,8vw,112px)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:clamp(32px,5vw,72px);align-items:start">
+    <div style="display:flex;flex-direction:column;gap:clamp(32px,4vw,48px)">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B;margin-bottom:8px">What happens</div>
+        <sc-for list="{{ inaugSteps }}" as="st" hint-placeholder-count="3">
+          <div style="display:flex;gap:22px;padding:22px 0;border-top:1px solid rgba(244,233,217,.2)">
+            <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:40px;line-height:1;color:#EBB65B;flex:0 0 56px">{{ st.n }}</span>
+            <div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:26px;line-height:1.15">{{ st.t }}</div>
+              <div style="color:#D9C3B0;margin-top:4px">{{ st.d }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:24px;border:1px solid rgba(244,233,217,.25);border-radius:8px;padding:20px;background:rgba(30,4,7,.35)">
+        <div style="flex:0 0 150px;aspect-ratio:3/4;border:1px solid rgba(244,233,217,.25);background:repeating-linear-gradient(135deg,rgba(244,233,217,.1) 0 12px,rgba(244,233,217,.03) 12px 24px);display:grid;place-items:center;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:8px">Vaibhav Kant<br>placeholder photo</div>
+        <div style="flex:1 1 220px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">Stand-up comedy</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;line-height:1.05">Vaibhav Kant</div>
+          <p style="margin:0;color:#E8D6C4;font-size:16px">Short bio to be added. The comedy show is for NIT Delhi students only, and the show guidelines are accepted at registration.</p>
+        </div>
+      </div>
+    </div>
+    <div style="border:1px solid rgba(244,233,217,.25);border-radius:8px;background:rgba(30,4,7,.35);padding:clamp(20px,3vw,32px);display:flex;flex-direction:column">
+      <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B;margin-bottom:8px">Details</div>
+      <sc-for list="{{ inaugFacts }}" as="f" hint-placeholder-count="6">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 20px;padding:14px 0;border-top:1px solid rgba(244,233,217,.16)">
+          <span style="color:#D9C3B0;font-size:15px">{{ f.k }}</span>
+          <span style="font-weight:600;text-align:right">{{ f.v }}</span>
+        </div>
+      </sc-for>
+      <a href="#/register" style="margin-top:22px;display:inline-flex;justify-content:center;align-items:center;gap:10px;background:#EBB65B;color:#2E070B;font-weight:700;font-size:16px;padding:15px 26px;border-radius:999px" style-hover="background:#F4E9D9;color:#2E070B">Register with your Universal Pass <span>→</span></a>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isPhotowalk }}" hint-placeholder-val="{{ false }}">
+<main style="background:#430B10;padding:clamp(40px,6vw,80px) 0 clamp(56px,8vw,112px)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;gap:clamp(40px,6vw,72px)">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,5vw,72px);align-items:center">
+      <div style="display:flex;align-items:baseline;gap:18px">
+        <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(120px,20vw,240px);line-height:.85;letter-spacing:-.05em;color:#EBB65B">90</span>
+        <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(22px,2.6vw,30px);line-height:1.15">NIT Delhi students selected</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">How selection works</div>
+        <p style="margin:0;font-size:19px;text-wrap:pretty">Selection is based on attendance across the Inaugural and all four workshops. Higher attendance ranks higher. Ties are broken by engagement with the speakers.</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+      <sc-for list="{{ walkSessions }}" as="s" hint-placeholder-count="5">
+        <div style="border:1px solid rgba(244,233,217,.25);border-radius:8px;padding:18px;background:rgba(30,4,7,.35);display:flex;flex-direction:column;gap:6px">
+          <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;color:#EBB65B">{{ s.n }} / 05</span>
+          <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:22px;line-height:1.1">{{ s.t }}</span>
+          <span style="font-size:14px;color:#D9C3B0">{{ s.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+      <sc-for list="{{ walkInfo }}" as="i" hint-placeholder-count="3">
+        <div style="background:#F4E9D9;color:#2A0B0C;border-radius:8px;padding:clamp(22px,3vw,30px);display:flex;flex-direction:column;gap:8px">
+          <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#A82E17">{{ i.k }}</span>
+          <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;line-height:1.05">{{ i.v }}</span>
+          <span style="font-size:15px;color:#4A1E1A">{{ i.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isCompetitions }}" hint-placeholder-val="{{ false }}">
+<main style="background:#430B10;padding:clamp(40px,6vw,80px) 0 clamp(56px,8vw,112px)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;gap:clamp(40px,6vw,72px)">
+    <div style="border:1px solid rgba(235,182,91,.6);border-radius:8px;padding:16px 22px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;background:rgba(235,182,91,.08)">
+      <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">{{ liveTag }}</span>
+      <span style="font-size:16px">{{ liveText }}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px">
+        <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(30px,4vw,48px);line-height:1;letter-spacing:-.02em">Online on Unstop</h2>
+        <span style="color:#D9C3B0;font-size:16px">All-India · free · open to all students</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+        <sc-for list="{{ onlineComps }}" as="c" hint-placeholder-count="3">
+          <div style="background:#F4E9D9;color:#2A0B0C;border-radius:8px;padding:clamp(22px,3vw,30px);display:flex;flex-direction:column;gap:16px">
+            <span style="align-self:flex-start;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(168,46,23,.6);color:#A82E17;border-radius:999px;padding:4px 12px">{{ c.genre }}</span>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;line-height:1.05">{{ c.title }}</div>
+            <p style="margin:0;font-size:16px;color:#4A1E1A;flex:1">{{ c.desc }}</p>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 18px;font-size:15px;border-top:1px solid rgba(42,11,12,.2);padding-top:14px">
+              <span style="color:#6B3A33">Prize</span><span style="font-weight:700">{{ c.prize }}</span>
+              <span style="color:#6B3A33">Theme</span><span style="font-weight:700">{{ c.theme }}</span>
+              <span style="color:#6B3A33">Deadline</span><span style="font-weight:700">{{ c.deadline }}</span>
+            </div>
+            <a href="{{ c.href }}" style="{{ c.btn }}">{{ c.btnLabel }}</a>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px">
+        <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(30px,4vw,48px);line-height:1;letter-spacing:-.02em">In-campus</h2>
+        <span style="color:#D9C3B0;font-size:16px">NIT Delhi students only · submissions via Google Forms</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+        <sc-for list="{{ campusComps }}" as="c" hint-placeholder-count="2">
+          <div style="border:1px solid rgba(244,233,217,.3);border-radius:8px;padding:clamp(22px,3vw,30px);display:flex;flex-direction:column;gap:16px;background:rgba(30,4,7,.35)">
+            <span style="align-self:flex-start;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(235,182,91,.6);color:#EBB65B;border-radius:999px;padding:4px 12px">{{ c.genre }}</span>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;line-height:1.05">{{ c.title }}</div>
+            <p style="margin:0;font-size:16px;color:#E8D6C4;flex:1">{{ c.desc }}</p>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 18px;font-size:15px;border-top:1px solid rgba(244,233,217,.2);padding-top:14px">
+              <span style="color:#D9C3B0">Prize</span><span style="font-weight:700">{{ c.prize }}</span>
+              <span style="color:#D9C3B0">Theme</span><span style="font-weight:700">{{ c.theme }}</span>
+              <span style="color:#D9C3B0">Deadline</span><span style="font-weight:700">{{ c.deadline }}</span>
+            </div>
+            <a href="{{ c.href }}" style="{{ c.btn }}">{{ c.btnLabel }}</a>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isExhibition }}" hint-placeholder-val="{{ false }}">
+<main style="background:#0E0A14;color:#F6E6D0">
+  <section style="position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,#3B1766 0%,#150D22 58%,#0E0A14 100%);padding:clamp(56px,9vw,120px) 0 clamp(64px,9vw,120px)">
+    <div style="position:absolute;right:-6vw;top:-14vw;width:min(640px,80vw);aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle at 50% 50%,#FF7A1A 0 3px,transparent 3px 28px);opacity:.2"></div>
+    <div style="position:absolute;right:calc(-6vw + min(640px,80vw)*.3);top:calc(-14vw + min(640px,80vw)*.3);width:calc(min(640px,80vw)*.4);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#FF9A3C 0%,#FF7A1A 55%,#C4500A 100%);box-shadow:0 0 120px 30px rgba(255,122,26,.35);opacity:.9"></div>
+    <div style="position:absolute;left:-10%;bottom:-60px;width:70%;height:200px;background:radial-gradient(ellipse,rgba(170,130,230,.28),transparent 70%);filter:blur(30px)"></div>
+    <div style="position:absolute;right:-10%;bottom:-80px;width:60%;height:220px;background:radial-gradient(ellipse,rgba(170,130,230,.2),transparent 70%);filter:blur(36px)"></div>
+    <div style="position:relative;max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;gap:26px">
+      <div style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#FF9A3C">4 &amp; 5 November · NIT Delhi · Halloween theme</div>
+      <h1 style="margin:0;font-family:'Creepster',cursive;font-weight:400;font-size:clamp(68px,14vw,200px);line-height:.9;letter-spacing:.02em;color:#FF7A1A;text-shadow:0 0 48px rgba(255,122,26,.45)">Grand<br>Exhibition</h1>
+      <p style="margin:0;font-size:clamp(18px,2vw,22px);max-width:620px;color:#EBD9F5;text-wrap:pretty">Two evenings of games, food, films, performances and the best work from Radiance. Open to everyone. No registration needed.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:760px;margin-top:10px">
+        <sc-for list="{{ exDays }}" as="d" hint-placeholder-count="2">
+          <div style="border:1.5px solid rgba(255,122,26,.6);border-radius:10px;padding:22px;background:rgba(14,10,20,.7);display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#FF9A3C">{{ d.k }}</span>
+            <span style="font-family:'Creepster',cursive;font-size:44px;line-height:1;letter-spacing:.03em">{{ d.date }}</span>
+            <span style="font-weight:700;font-size:18px">{{ d.time }}</span>
+            <span style="color:#D5BFE8;font-size:15px">{{ d.note }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+  <section style="padding:clamp(56px,8vw,104px) 0">
+    <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;gap:36px">
+      <h2 style="margin:0;font-family:'Creepster',cursive;font-weight:400;font-size:clamp(44px,7vw,84px);line-height:1;letter-spacing:.03em;color:#FF7A1A">What's inside</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px">
+        <sc-for list="{{ exSections }}" as="e" hint-placeholder-count="7">
+          <div style="border:1px solid rgba(180,140,235,.35);border-radius:10px;padding:24px;background:linear-gradient(160deg,#1E1233,#130C20);display:flex;flex-direction:column;gap:10px;min-height:190px" style-hover="border-color:#FF7A1A">
+            <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;color:#FF9A3C">{{ e.n }}</span>
+            <span style="font-family:'Creepster',cursive;font-size:34px;line-height:1;letter-spacing:.03em">{{ e.t }}</span>
+            <span style="font-size:16px;color:#D5BFE8">{{ e.d }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+  <section style="padding:0 0 clamp(56px,8vw,112px)">
+    <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#FF9A3C">Radiance 2025 exhibition</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+        <sc-for list="{{ exPhotos }}" as="p" hint-placeholder-count="3">
+          <div style="aspect-ratio:4/3;border:1px solid rgba(180,140,235,.35);background:repeating-linear-gradient(135deg,rgba(180,140,235,.14) 0 14px,rgba(180,140,235,.04) 14px 28px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#D5BFE8;text-align:center;padding:12px"><span>{{ p }}</span><span>placeholder photo</span></div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+</main>
+</sc-if>
+
+<sc-if value="{{ isRegister }}" hint-placeholder-val="{{ false }}">
+<main style="background:#430B10;padding:clamp(40px,6vw,80px) 0 clamp(56px,8vw,112px)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px)">
+
+  <sc-if value="{{ noTicket }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-wrap:wrap;gap:clamp(24px,4vw,48px);align-items:flex-start">
+      <div style="flex:1 1 520px;min-width:0;background:#F4E9D9;color:#2A0B0C;border-radius:10px;padding:clamp(22px,3.4vw,44px);display:flex;flex-direction:column;gap:26px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px 20px">
+          <sc-for list="{{ fields }}" as="f" hint-placeholder-count="8">
+            <div style="grid-column:{{ f.span }};display:flex;flex-direction:column;gap:8px;min-width:0">
+              <label style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6B3A33">{{ f.label }}</label>
+              <sc-if value="{{ f.isText }}" hint-placeholder-val="{{ true }}">
+                <input type="{{ f.type }}" value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.ph }}" style="width:100%;padding:13px 14px;border:1.5px solid {{ f.bc }};border-radius:8px;background:#FBF5EA;font-size:16px;color:#2A0B0C;outline:none" style-focus="border-color:#A82E17">
+              </sc-if>
+              <sc-if value="{{ f.isChips }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <sc-for list="{{ f.chips }}" as="c" hint-placeholder-count="4">
+                    <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ f.hasHint }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:#6B3A33">{{ f.hint }}</span></sc-if>
+              <sc-if value="{{ f.hasErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;font-weight:600;color:#A4210F">{{ f.err }}</span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ isOutside }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid rgba(42,11,12,.18);padding-top:24px">
+            <label style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6B3A33">Workshops · select one or more</label>
+            <sc-for list="{{ wsRows }}" as="r" hint-placeholder-count="4">
+              <div onClick="{{ r.onClick }}" style="{{ r.style }}">
+                <span style="{{ r.box }}">{{ r.mark }}</span>
+                <span style="flex:1;display:flex;flex-direction:column"><span style="font-weight:700;font-size:17px">{{ r.n }}</span><span style="font-size:14px;color:#6B3A33">{{ r.d }}</span></span>
+                <span style="{{ r.tag }}">{{ r.status }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ errWs }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;font-weight:600;color:#A4210F">{{ errWsText }}</span></sc-if>
+          </div>
+        </sc-if>
+
+        <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid rgba(42,11,12,.18);padding-top:24px">
+          <label style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6B3A33">Undertakings</label>
+          <sc-for list="{{ consentRows }}" as="c" hint-placeholder-count="2">
+            <div onClick="{{ c.onClick }}" style="display:flex;gap:14px;align-items:flex-start;padding:14px;border:1.5px solid rgba(42,11,12,.2);border-radius:8px;cursor:pointer;background:#FBF5EA" style-hover="border-color:#A82E17">
+              <span style="{{ c.box }}">{{ c.mark }}</span>
+              <span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700;font-size:16px">{{ c.t }}</span><span style="font-size:14px;color:#4A1E1A">{{ c.d }}</span></span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ errConsent }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;font-weight:600;color:#A4210F">{{ errConsentText }}</span></sc-if>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px">
+          <button onClick="{{ submit }}" style="background:#A82E17;color:#F4E9D9;border:0;border-radius:999px;font-weight:700;font-size:17px;padding:16px 34px;cursor:pointer" style-hover="background:#2A0B0C">Register and get ticket →</button>
+          <span style="font-size:14px;color:#6B3A33;flex:1 1 220px">No identity check on the website. NIT Delhi students are verified at the venue.</span>
+        </div>
+      </div>
+
+      <aside style="flex:1 1 300px;max-width:420px;display:flex;flex-direction:column;gap:18px;border:1px solid rgba(244,233,217,.25);border-radius:10px;padding:clamp(22px,3vw,32px);background:rgba(30,4,7,.35)">
+        <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">Your pass</div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px;line-height:1">{{ passName }}</div>
+        <div style="font-size:15px;color:#D9C3B0">{{ passFor }}</div>
+        <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid rgba(244,233,217,.2);padding-top:16px">
+          <sc-for list="{{ passIn }}" as="p" hint-placeholder-count="4">
+            <div style="display:flex;gap:12px;font-size:16px"><span style="color:#EBB65B">✓</span><span>{{ p }}</span></div>
+          </sc-for>
+          <sc-for list="{{ passOut }}" as="p" hint-placeholder-count="0">
+            <div style="display:flex;gap:12px;font-size:16px;color:#D9C3B0"><span>✕</span><span>{{ p }}</span></div>
+          </sc-for>
+        </div>
+      </aside>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasTicket }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-wrap:wrap;gap:clamp(28px,5vw,72px);align-items:flex-start;justify-content:center">
+      <div style="flex:0 1 380px;width:100%;background:#F4E9D9;color:#2A0B0C;border-radius:18px;overflow:hidden;box-shadow:12px 12px 0 #1E0407">
+        <div style="background:url(assets/pattern.jpg) center/cover,#430B10;padding:16px 18px"><div style="background:#F4E9D9;border-radius:6px;padding:4px 10px"><div style="aspect-ratio:2172/510;overflow:hidden"><img src="assets/radiance26-logo.png" alt="Radiance 2026" style="width:100%;display:block;margin-top:-3.2%"></div></div></div>
+        <div style="padding:22px 26px 20px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+            <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#6B3A33">Entry ticket</span>
+            <span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:#A82E17;color:#F4E9D9;border-radius:999px;padding:4px 12px">{{ ticket.type }}</span>
+          </div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;line-height:1.05;letter-spacing:-.01em;overflow-wrap:anywhere">{{ ticket.name }}</div>
+          <div style="font-size:15px;color:#4A1E1A">{{ ticket.inst }} · {{ ticket.roll }}</div>
+        </div>
+        <div style="position:relative;border-top:2px dashed rgba(42,11,12,.3);margin:0 14px">
+          <span style="position:absolute;left:-26px;top:-13px;width:24px;height:24px;border-radius:50%;background:#430B10"></span>
+          <span style="position:absolute;right:-26px;top:-13px;width:24px;height:24px;border-radius:50%;background:#430B10"></span>
+        </div>
+        <div style="padding:22px 26px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <div style="width:144px;height:144px;background:#FBF5EA;padding:8px;border:1.5px solid rgba(42,11,12,.2);border-radius:8px">
+            <svg viewBox="{{ qr.vb }}" width="100%" height="100%" style="display:block;shape-rendering:crispEdges"><path d="{{ qr.d }}" fill="#2A0B0C"></path></svg>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+            <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#6B3A33">Token ID</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:500;font-size:24px;letter-spacing:.04em">{{ ticket.token }}</span>
+            <span style="font-size:13px;color:#6B3A33">Show at every event</span>
+          </div>
+        </div>
+        <sc-if value="{{ ticket.hasWs }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 26px 22px;display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#6B3A33">Workshops</span>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <sc-for list="{{ ticket.ws }}" as="w" hint-placeholder-count="2">
+                <span style="border:1.5px solid rgba(42,11,12,.3);border-radius:999px;padding:5px 14px;font-size:14px;font-weight:600">{{ w }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <div style="background:#2E070B;color:#F4E9D9;padding:12px 26px;display:flex;align-items:center;gap:12px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase">
+          <span>Title Sponsor</span>
+          <span style="width:44px;height:18px;border:1px dashed rgba(244,233,217,.5);background:repeating-linear-gradient(135deg,rgba(244,233,217,.16) 0 5px,transparent 5px 10px)"></span>
+          <span>Bharat Petroleum</span>
+        </div>
+      </div>
+      <div style="flex:1 1 320px;max-width:520px;display:flex;flex-direction:column;gap:22px">
+        <div style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">{{ doneTag }}</div>
+        <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(36px,5vw,64px);line-height:1;letter-spacing:-.02em">{{ doneTitle }}</h2>
+        <p style="margin:0;font-size:19px;text-wrap:pretty">{{ doneText }}</p>
+        <div style="border:1px solid rgba(235,182,91,.6);border-radius:8px;padding:16px 20px;background:rgba(235,182,91,.08);font-size:16px">Take a screenshot of this ticket or keep the email handy; you'll need to show the QR / token at every event.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px">
+          <a href="#/home" style="display:inline-flex;align-items:center;gap:10px;background:#EBB65B;color:#2E070B;font-weight:700;font-size:16px;padding:14px 26px;border-radius:999px" style-hover="background:#F4E9D9;color:#2E070B">Back to home</a>
+          <button onClick="{{ again }}" style="border:1.5px solid rgba(244,233,217,.55);background:transparent;color:#F4E9D9;font-weight:700;font-size:16px;padding:14px 26px;border-radius:999px;cursor:pointer" style-hover="background:rgba(244,233,217,.12)">Register someone else</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  </div>
+</main>
+</sc-if>
+
+<footer style="margin-top:auto;background:{{ footBg }};border-top:1px solid rgba(244,233,217,.14)">
+  <div style="max-width:1200px;margin:0 auto;padding:clamp(40px,6vw,72px) clamp(20px,5vw,64px) 28px;display:flex;flex-direction:column;gap:40px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:32px 48px">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Radiance <span style="color:#EBB65B">2026</span></div>
+        <div style="font-size:15px;color:#D9C3B0">3rd edition of NIT Delhi's Annual Creative Fest, organized by Clairvoyance, the Photography and Film Club of NIT Delhi.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B;margin-bottom:4px">Pages</div>
+        <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="6"><a href="{{ l.href }}" style="font-size:15px;color:#F4E9D9" style-hover="color:#EBB65B">{{ l.label }}</a></sc-for>
+        <a href="#/register" style="font-size:15px;color:#F4E9D9" style-hover="color:#EBB65B">Register</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B;margin-bottom:4px">Contact</div>
+        <div style="font-size:15px;color:#D9C3B0">Contact details to be added</div>
+        <div style="display:flex;gap:16px;margin-top:6px;font-size:15px;font-weight:600">
+          <a href="#">Instagram</a><a href="#">YouTube</a><a href="#">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(244,233,217,.14);padding-top:22px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#D9C3B0">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span>Title Sponsor</span>
+        <span style="width:56px;height:22px;border:1px dashed rgba(244,233,217,.45);background:repeating-linear-gradient(135deg,rgba(244,233,217,.16) 0 6px,transparent 6px 12px)"></span>
+        <span style="color:#F4E9D9">Bharat Petroleum</span>
+      </div>
+      <span>NIT Delhi · 26 Oct – 5 Nov 2026</span>
+    </div>
+  </div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;competitionsLive&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;photographySeatsFull&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+class Component extends DCLogic {
+  state = { page:'home', w:1200, menu:false, slide:0,
+    f:{name:'',gender:'',inst:'NIT Delhi',instName:'',roll:'',year:'',branch:'',phone:'',email:''},
+    ws:[], cons:{}, err:{}, ticket:null, dup:false, regs:[] };
+
+  componentDidMount(){
+    const ok=['home','workshops','inaugural','photowalk','competitions','exhibition','register'];
+    this.onHash=()=>{ const p=location.hash.replace(/^#\/?/,'')||'home'; this.setState({page:ok.includes(p)?p:'home',menu:false}); window.scrollTo(0,0); };
+    this.onResize=()=>this.setState({w:window.innerWidth});
+    window.addEventListener('hashchange',this.onHash); window.addEventListener('resize',this.onResize);
+    this.onHash(); this.onResize();
+  }
+  componentWillUnmount(){ window.removeEventListener('hashchange',this.onHash); window.removeEventListener('resize',this.onResize); }
+
+  setF(k){ return e=>{ const v=e.target.value; this.setState(s=>({f:{...s.f,[k]:v},err:{...s.err,[k]:null}})); }; }
+  pick(k,v){ return ()=>this.setState(s=>({f:{...s.f,[k]:v},err:{...s.err,[k]:null},...(k==='inst'?{ws:[],cons:{},err:{}}:{})})); }
+
+  qr(text){
+    try{
+      const q=qrcode(0,'M'); q.addData(text); q.make(); const n=q.getModuleCount(); let d='';
+      for(let r=0;r<n;r++)for(let c=0;c<n;c++) if(q.isDark(r,c)) d+='M'+c+' '+r+'h1v1h-1z';
+      return {d,vb:'0 0 '+n+' '+n};
+    }catch(e){
+      const n=25; let h=0; for(const ch of text) h=(h*31+ch.charCodeAt(0))>>>0; let d='';
+      const fin=(r,c)=>[[0,0],[0,n-7],[n-7,0]].some(([a,b])=>r>=a&&r<a+7&&c>=b&&c<b+7);
+      for(let r=0;r<n;r++)for(let c=0;c<n;c++){
+        if(fin(r,c)){ const a=r<7?r:r-(n-7), b=c<7?c:c-(n-7); if(a===0||a===6||b===0||b===6||(a>=2&&a<=4&&b>=2&&b<=4)) d+='M'+c+' '+r+'h1v1h-1z'; }
+        else { h=(h*1664525+1013904223)>>>0; if(h&0x80000000) d+='M'+c+' '+r+'h1v1h-1z'; }
+      }
+      return {d,vb:'0 0 '+n+' '+n};
+    }
+  }
+
+  submit=()=>{
+    const {f,ws,cons,regs}=this.state, nit=f.inst==='NIT Delhi', e={};
+    if(!f.name.trim()) e.name='Enter your full name';
+    if(!f.gender) e.gender='Select one';
+    if(!nit&&!f.instName.trim()) e.instName='Enter your institute name';
+    if(!f.roll.trim()) e.roll='Enter your roll number';
+    if(!f.year) e.year='Select your year';
+    if(!f.branch.trim()) e.branch='Enter your branch';
+    const digits=f.phone.replace(/\D/g,'');
+    if(digits.length<10) e.phone='Enter a valid phone number';
+    if(!/^\S+@\S+\.\S+$/.test(f.email.trim())) e.email='Enter a valid email address';
+    if(!nit&&!ws.length) e.ws='Select at least one workshop';
+    if((nit?['comedy','walk']:['norms']).some(k=>!cons[k])) e.consent='Please accept all undertakings to continue';
+    if(Object.keys(e).length){ this.setState({err:e}); return; }
+    const em=f.email.trim().toLowerCase(), ph=digits.slice(-10), ro=f.roll.trim().toLowerCase();
+    const old=regs.find(r=>r.em===em||r.ph===ph||r.ro===ro);
+    if(old){ this.setState({ticket:old.ticket,dup:true}); window.scrollTo(0,0); return; }
+    const names={photo:'Photography',film:'Cinematic Filmmaking',motion:'Motion Design',graphic:'Graphic Design'};
+    const ticket={token:'RAD26-'+String(regs.length+1).padStart(4,'0'),name:f.name.trim(),type:nit?'Universal Pass':'Workshop Pass',
+      inst:nit?'NIT Delhi':f.instName.trim(),roll:f.roll.trim(),email:f.email.trim(),hasWs:!nit,ws:ws.map(k=>names[k])};
+    this.setState({ticket,dup:false,regs:[...regs,{em,ph,ro,ticket}]}); window.scrollTo(0,0);
+  };
+  again=()=>this.setState({ticket:null,dup:false,f:{name:'',gender:'',inst:'NIT Delhi',instName:'',roll:'',year:'',branch:'',phone:'',email:''},ws:[],cons:{},err:{}});
+
+  renderVals(){
+    const s=this.state,P=this.props,live=P.competitionsLive??false,full=P.photographySeatsFull??false;
+    const pg=s.page,ex=pg==='exhibition',mob=s.w<1100,nit=s.f.inst==='NIT Delhi';
+
+    const NAV=[['home','Home'],['workshops','Workshops'],['inaugural','Inaugural'],['photowalk','Photo Walk'],['competitions','Competitions'],['exhibition','Exhibition']];
+    const navLinks=NAV.map(([k,l])=>({href:'#/'+k,label:l,color:pg===k?'#F4E9D9':'#D9C3B0',line:pg===k?(ex?'#FF7A1A':'#EBB65B'):'transparent'}));
+
+    const META={
+      workshops:{eyebrow:'Workshops · 27–30 Oct',title:'Four workshops with working creators',lead:'Photography, filmmaking, motion design and graphic design. This page is information only; everyone registers once on the registration page.',chips:['2–3 hours each','NIT Delhi + limited outside seats','Free for outside students']},
+      inaugural:{eyebrow:'Inaugural · 26 Oct',title:'Inaugural Ceremony',lead:'Explains the format of Radiance and the workshops line-up, followed by a stand-up comedy show.',chips:['Monday 26 Oct','5:30–7:30 PM','NIT Delhi students only']},
+      photowalk:{eyebrow:'Photo Walk · 31 Oct',title:'Delhi Photo Walk',lead:'A multi-location walk through Delhi by institute bus, with 4–5 stops across the city.',chips:['Saturday 31 Oct','Entire day','90 NIT Delhi students']},
+      competitions:{eyebrow:'Competitions',title:'Compete across India, or on campus',lead:'A total prize pool of ₹25K+ across Unstop, in-campus and other prizes.',chips:['Unstop · free · open to all students','In-campus · NIT Delhi only']},
+      register:{eyebrow:'Registration',title:'Register for Radiance 2026',lead:'One registration, one ticket. Visit once, then show the QR or token ID at every event.',chips:[]}
+    };
+    const meta=META[pg]||{eyebrow:'',title:'',lead:'',chips:[]};
+
+    const D=(day,mon,dow,title,sub,time,who,href)=>({day,mon,dow,title,sub,time,who,href});
+    const schedule=[
+      D('26','Oct','Mon','Inaugural Ceremony','Plus stand-up comedy by Vaibhav Kant','5:30–7:30 PM','NIT Delhi only','#/inaugural'),
+      D('27','Oct','Tue','Photography Workshop','Powered by Nikon','5:30–7:30 PM · 2 hrs','NIT Delhi + outside (limited)','#/workshops'),
+      D('28','Oct','Wed','Cinematic Filmmaking Workshop','By Shoot Guru','3:30–6:30 PM · 3 hrs','NIT Delhi + outside (limited)','#/workshops'),
+      D('29','Oct','Thu','Motion Design Workshop','By Motion Nation (Abhishek)','5:30–7:30 PM · 2 hrs','NIT Delhi + outside (limited)','#/workshops'),
+      D('30','Oct','Fri','Graphic Design Workshop','By Gaurav Dholia','5:30–7:30 PM · 2 hrs','NIT Delhi + outside (limited)','#/workshops'),
+      D('31','Oct','Sat','Delhi Photo Walk','Multi-location, by institute bus','Entire day','90 selected NIT Delhi students','#/photowalk'),
+      D('4','Nov','Wed','Grand Exhibition, Day 1','Halloween theme','3:30–10:00 PM','Everyone · no registration','#/exhibition'),
+      D('5','Nov','Thu','Grand Exhibition, Day 2','Plus the closing of Radiance','5:30–10:00 PM','Everyone · no registration','#/exhibition')
+    ];
+    const notes=[
+      {k:'Refreshments',t:'Provided to attendees of the inaugural ceremony and all four workshops.'},
+      {k:'SRHC campus bus',t:'NIT Delhi students based at the SRHC campus get a separate bus at 7:45 PM on 26, 27, 28, 29 and 30 Oct.'}
+    ];
+
+    const slideLabels=['Inaugural','Workshops','Photo walk','Exhibition','Winners'];
+    const slides=slideLabels.map(label=>({label}));
+    const n=slides.length;
+    const dots=slideLabels.map((l,i)=>({label:'Go to photo '+(i+1),go:()=>this.setState({slide:i}),
+      style:'height:10px;border-radius:99px;border:0;padding:0;cursor:pointer;transition:all .3s;width:'+(i===s.slide?28:10)+'px;background:'+(i===s.slide?'#EBB65B':'rgba(244,233,217,.3)')}));
+
+    const W=(n,date,time,title,by,speaker,bio,big,bigLabel,points,social,photo,order)=>({n,date,title,by,speaker,bio,big,bigLabel,points,hasPoints:points.length>0,social,photo,order,chips:[time,'NIT Delhi + outside (limited)']});
+    const workshops=[
+      W('01','Tue 27 Oct','5:30–7:30 PM · 2 hrs','Photography Workshop','Powered by Nikon','Speaker to be announced','The speaker name and bio for the Nikon-powered photography workshop will be added here.','Nikon','Powered by',[],'Speaker social links','Nikon speaker',0),
+      W('02','Wed 28 Oct','3:30–6:30 PM · 3 hrs','Cinematic Filmmaking Workshop','By Shoot Guru','Shoot Guru','Shoot Guru teaches cinematography and basic video editing and has 207K followers on Instagram.','207K','Instagram followers',['Cinematography','Basic video editing','Participants are split into crews and make a short film on a given topic','The best film wins prizes'],'Shoot Guru on Instagram','Shoot Guru',1),
+      W('03','Thu 29 Oct','5:30–7:30 PM · 2 hrs','Motion Design Workshop','By Motion Nation','Abhishek · Motion Nation','Abhishek runs Motion Nation, a YouTube channel with 250K+ subscribers, and teaches motion designing.','250K+','YouTube subscribers',['Motion designing'],'Motion Nation on YouTube','Abhishek',0),
+      W('04','Fri 30 Oct','5:30–7:30 PM · 2 hrs','Graphic Design Workshop','By Gaurav Dholia','Gaurav Dholia','Gaurav Dholia is an expert graphic designer with many years of experience. He also spoke at a previous Radiance.','Returning','Past Radiance speaker',[],'Gaurav Dholia on Instagram','Gaurav Dholia',1)
+    ];
+
+    const inaugSteps=[{n:'01',t:'The format of Radiance',d:'How the eight days are organised and how the Universal Pass works.'},{n:'02',t:'The workshops line-up',d:'A walkthrough of the four workshops and their speakers.'},{n:'03',t:'Stand-up comedy by Vaibhav Kant',d:'The evening closes with a comedy show.'}];
+    const inaugFacts=[{k:'Date',v:'Monday 26 Oct'},{k:'Time',v:'5:30–7:30 PM'},{k:'Who can attend',v:'NIT Delhi students only'},{k:'Venue',v:'To be announced'},{k:'Refreshments',v:'Provided'},{k:'SRHC campus bus',v:'7:45 PM'}];
+
+    const walkSessions=[{n:'01',t:'Inaugural',d:'26 Oct'},{n:'02',t:'Photography',d:'27 Oct'},{n:'03',t:'Filmmaking',d:'28 Oct'},{n:'04',t:'Motion Design',d:'29 Oct'},{n:'05',t:'Graphic Design',d:'30 Oct'}];
+    const walkInfo=[{k:'Locations',v:'To be revealed soon',d:'4–5 stops across Delhi, boarded by institute bus.'},{k:'Collaborating colleges',v:'To be revealed soon',d:'Partner institutes join the walk.'},{k:'Date and time',v:'31 Oct · Entire day',d:'Saturday, for the selected students.'}];
+
+    const comp=(genre,title,desc,pr,btnLabel,campus)=>{
+      const a='Announced 26 Oct';
+      const on='display:inline-flex;justify-content:center;align-items:center;gap:8px;font-weight:700;font-size:16px;padding:14px 22px;border-radius:999px;'+(campus?'background:#EBB65B;color:#2E070B':'background:#A82E17;color:#F4E9D9');
+      const off='display:inline-flex;justify-content:center;align-items:center;font-weight:700;font-size:16px;padding:14px 22px;border-radius:999px;pointer-events:none;border:1.5px dashed '+(campus?'rgba(244,233,217,.45);color:#D9C3B0':'rgba(42,11,12,.4);color:#6B3A33');
+      return {genre,title,desc,prize:live?pr:a,theme:live?'See the competition page':a,deadline:live?'3 Nov, 11:59 PM':a,btnLabel:live?btnLabel:'Coming soon',btn:live?on:off,href:live?'#':undefined};
+    };
+    const onlineComps=[
+      comp('Photography','Theme-Based Photography Competition','A national-level photography competition for students from colleges across India.','₹8,000','Go to Unstop ↗'),
+      comp('Filmmaking','Film Making Competition','A short film competition open to filmmakers and film clubs across India.','₹10,000','Go to Unstop ↗'),
+      comp('Graphic design','Poster Design Competition','A poster design competition for student designers.','₹4,000','Go to Unstop ↗')
+    ];
+    const campusComps=[
+      comp('Photography','In-Campus Photography Contest','Open to NIT Delhi students. Submit your entry through the Google Form.','₹3,000','Open Google Form ↗',true),
+      comp('Short video','In-Campus Short Video Contest','Open to NIT Delhi students. Submit your entry through the Google Form.','₹3,000','Open Google Form ↗',true)
+    ];
+
+    const exDays=[{k:'Day 1',date:'Wed 4 Nov',time:'3:30 PM – 10:00 PM',note:'Halloween theme'},{k:'Day 2',date:'Thu 5 Nov',time:'5:30 PM – 10:00 PM',note:'Closing of Radiance'}];
+    const exSections=[['Activities & Games','Snakes and ladders and other games, plus a Polaroid and photo booth.'],['Food Stalls','Food stalls open through both evenings.'],['Movie Screenings','Screenings in the LT.'],['Performances','Live performances on stage.'],['Best Photographs','A display of the best photographs from Radiance.'],['Best Films','The best films from the in-house film competition.'],['Prizes','Prizes for the best work across Radiance.']].map(([t,d],i)=>({n:'0'+(i+1),t,d}));
+
+    // registration
+    const chipSet=(k,opts)=>opts.map(o=>({label:o,onClick:this.pick(k,o),style:'font-size:15px;font-weight:600;padding:9px 18px;border-radius:999px;cursor:pointer;border:1.5px solid '+(s.f[k]===o?'#430B10':'rgba(42,11,12,.3)')+';background:'+(s.f[k]===o?'#430B10':'transparent')+';color:'+(s.f[k]===o?'#F4E9D9':'#2A0B0C')}));
+    const fld=(k,label,o={})=>({label,span:o.wide?'1 / -1':'auto',isText:!o.chips,isChips:!!o.chips,chips:o.chips?chipSet(k,o.chips):[],type:o.type||'text',ph:o.ph||'',value:s.f[k],onChange:this.setF(k),bc:s.err[k]?'#A4210F':'rgba(42,11,12,.3)',hint:o.hint||'',hasHint:!!o.hint&&!s.err[k],err:s.err[k]||'',hasErr:!!s.err[k]});
+    const fields=[
+      fld('name','Full name'),
+      fld('email','Email ID',{type:'email',hint:nit?'NIT Delhi emails end with @nitdelhi.ac.in':''}),
+      fld('phone','Phone number',{type:'tel'}),
+      fld('roll','Roll number',{hint:nit?'NIT Delhi roll numbers start with 2':''}),
+      fld('gender','Gender',{chips:['Male','Female','Other','Prefer not to say'],wide:true}),
+      fld('inst','Institute',{chips:['NIT Delhi','Other'],wide:true}),
+      ...(nit?[]:[fld('instName','Institute name',{wide:true})]),
+      fld('year','Year',{chips:['1st','2nd','3rd','4th','Other'],wide:true}),
+      fld('branch','Branch',{wide:true})
+    ];
+    const WS=[['photo','Photography','27 Oct · 5:30–7:30 PM',full?15:9],['film','Cinematic Filmmaking','28 Oct · 3:30–6:30 PM',11],['motion','Motion Design','29 Oct · 5:30–7:30 PM',4],['graphic','Graphic Design','30 Oct · 5:30–7:30 PM',7]];
+    const wsRows=WS.map(([k,nm,d,taken])=>{
+      const left=15-taken,fullW=left<=0,on=s.ws.includes(k);
+      return {n:nm,d,status:fullW?'Seats full':left+' seats left',mark:on?'✓':'',
+        onClick:()=>{ if(fullW) return; this.setState(st=>({ws:st.ws.includes(k)?st.ws.filter(x=>x!==k):[...st.ws,k],err:{...st.err,ws:null}})); },
+        style:'display:flex;align-items:center;gap:14px;padding:14px;border-radius:8px;border:1.5px solid '+(on?'#430B10':'rgba(42,11,12,.2)')+';background:'+(fullW?'rgba(42,11,12,.06)':'#FBF5EA')+';cursor:'+(fullW?'not-allowed':'pointer')+';opacity:'+(fullW?.65:1),
+        box:'flex:0 0 24px;height:24px;border-radius:5px;border:1.5px solid #430B10;display:grid;place-items:center;font-size:15px;font-weight:700;background:'+(on?'#430B10':'transparent')+';color:#F4E9D9',
+        tag:'font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:'+(fullW?'#A4210F':'#6B3A33')+';font-weight:'+(fullW?700:400)};
+    });
+    const CONS=nit?[['comedy','Stand-up Comedy Show Guidelines','I understand the show may contain mature or edgy humour and accept the audience conduct rules: no recording, no heckling, respectful behaviour.'],['walk','Photo Walk Undertaking','I accept responsibility for my personal safety, will follow bus and group discipline and the organizers\' instructions, will not leave the group, and understand the institute is not liable for personal belongings.']]:[['norms','Institute Norms Guideline','I agree to follow NIT Delhi\'s institute rules and code of conduct while on campus.']];
+    const consentRows=CONS.map(([k,t,d])=>({t,d,mark:s.cons[k]?'✓':'',onClick:()=>this.setState(st=>({cons:{...st.cons,[k]:!st.cons[k]},err:{...st.err,consent:null}})),
+      box:'flex:0 0 24px;height:24px;margin-top:2px;border-radius:5px;border:1.5px solid #430B10;display:grid;place-items:center;font-size:15px;font-weight:700;background:'+(s.cons[k]?'#430B10':'transparent')+';color:#F4E9D9'}));
+
+    const passName=nit?'Universal Pass':'Workshop Pass';
+    const passFor=nit?'For NIT Delhi students. One registration, one ticket.':'For students of other institutes. Free of charge.';
+    const passIn=nit?['Inaugural ceremony and stand-up comedy','All four workshops','Photo walk, if selected','Grand Exhibition, 4 and 5 Nov']:['The workshops you select, 15 outside seats per workshop','Grand Exhibition on 4 Nov, open to everyone'];
+    const passOut=nit?[]:['Inaugural ceremony and comedy show','Photo walk'];
+
+    const t=s.ticket;
+    const doneTag=s.dup?'Already registered':'Registration complete';
+    const doneTitle=s.dup?'Your ticket is below':'You are registered';
+    const doneText=t?(s.dup?'You have already registered with these details. Your existing ticket is shown here and has been sent again to '+t.email+'.':'Your ticket has been emailed to '+t.email+'. It is valid for '+(t.type==='Universal Pass'?'the inaugural ceremony, all four workshops, the photo walk if you are selected, and the exhibition.':'the workshops you selected.')):'';
+
+    return {
+      rootBg:ex?'#0E0A14':'#2E070B', navBg:ex?'rgba(14,10,20,.92)':'rgba(46,7,11,.92)', footBg:ex?'#0A0710':'#1E0407',
+      navLinks,isDesktop:!mob,isMobile:mob,menuOpen:mob&&s.menu,menuLabel:s.menu?'Close':'Menu',toggleMenu:()=>this.setState(st=>({menu:!st.menu})),
+      isHome:pg==='home',isWorkshops:pg==='workshops',isInaugural:pg==='inaugural',isPhotowalk:pg==='photowalk',isCompetitions:pg==='competitions',isExhibition:ex,isRegister:pg==='register',
+      showHeader:!!META[pg],meta,
+      stats:[{n:'1000+',l:'Past participants'},{n:'₹25K+',l:'Prize pool this year'},{n:'200K+',l:'Social views across past editions'}],
+      schedule,notes,disciplines:['Photography','Filmmaking','Motion Design','Graphic Design'],
+      slides,slideX:'-'+(s.slide*100)+'%',dots,slideCounter:String(s.slide+1).padStart(2,'0')+' / '+String(n).padStart(2,'0'),
+      prev:()=>this.setState(st=>({slide:(st.slide+n-1)%n})),next:()=>this.setState(st=>({slide:(st.slide+1)%n})),
+      speakers:['Ayush Kumar Tripathi','Gaurav Dholia','Shivam','Anurag Roy','Nitin Chandra'].map((n,i)=>({n,i:'0'+(i+1)})),
+      collabs:[{n:'Dice Academy',s:'logo'},{n:'Olympus Cameras',s:'logo'},{n:'Unstop',s:'logo'},{n:'Fabs',s:'Kirori Mal College, DU'},{n:'Pixels',s:'Hansraj College, DU'}],
+      workshops,inaugSteps,inaugFacts,walkSessions,walkInfo,
+      liveTag:live?'Live now':'Coming soon',liveText:live?'Competition links are live. Submit your entries before the deadlines.':'Competitions go live on 26 Oct, the inaugural day. Links and details appear here.',
+      onlineComps,campusComps,exDays,exSections,exPhotos:['Exhibition','Photo booth','Screening'],
+      noTicket:!t,hasTicket:!!t,fields,isOutside:!nit,wsRows,errWs:!!s.err.ws,errWsText:s.err.ws||'',consentRows,errConsent:!!s.err.consent,errConsentText:s.err.consent||'',
+      submit:this.submit,again:this.again,passName,passFor,passIn,passOut,
+      ticket:t||{token:'',name:'',type:'',inst:'',roll:'',email:'',hasWs:false,ws:[]},qr:t?this.qr(t.token):{d:'',vb:'0 0 25 25'},
+      doneTag,doneTitle,doneText
+    };
+  }
+}
+</script>
+</body>
+</html>
