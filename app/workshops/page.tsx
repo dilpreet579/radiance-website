@@ -45,7 +45,6 @@ export default async function Workshops() {
                     className="object-cover"
                     style={{ objectPosition: "center 40%" }}
                     sizes="(max-width: 700px) 100vw, 800px"
-                    quality={90}
                   />
                 </div>
               ) : (

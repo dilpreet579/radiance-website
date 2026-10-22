@@ -28,7 +28,6 @@ export default function Carousel() {
                 priority={idx === 0}
                 className="object-cover"
                 sizes="(max-width: 1200px) 100vw, 1200px"
-                quality={85}
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-6 pt-12">
                 <span className="font-mono text-xs uppercase tracking-[.14em] text-gold">Radiance Highlights</span>
