@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Radiance 2026 website
 
-## Getting Started
+NIT Delhi's Annual Creative Fest (3rd edition, 26 Oct – 5 Nov 2026). Next.js (App Router) + Supabase + Resend.
+Spec: `docs/PLAN.md`. Design source: `docs/design-handoff/`.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Supabase**: create a project, run `supabase/schema.sql` in the SQL editor.
+2. **Admins**: in Supabase Auth, create 1 super admin + 5 scanner users (email/password). Then in the SQL editor:
+   ```sql
+   insert into admins (user_id, email, role)
+   select id, email, 'super' from auth.users where email = 'you@example.com';
+   -- scanners: role 'scanner'
+   ```
+3. **Resend**: create an API key; verify the sending domain so mail reaches any address.
+4. `cp .env.example .env.local` and fill it in.
+5. `npm install && npm run dev`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy (Vercel)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Set the same env vars (plus `CRON_SECRET`, `NEXT_PUBLIC_SITE_URL`). `vercel.json` schedules `/api/cron/reminders`
+daily at 04:00 UTC = 09:30 IST; it only sends on days that have a reminder template.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Where things live
 
-## Learn More
+| Area | Path |
+|---|---|
+| Public pages + copy | `app/*`, `lib/content.ts` |
+| Registration + ticket | `app/register`, `register_student()` in `supabase/schema.sql` |
+| Admin (login, scan, leaderboard, managers) | `app/admin` |
+| CSV export | `app/admin/export` |
+| Reminder emails + cron | `lib/reminders.ts`, `app/api/cron/reminders` |
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Admin-editable (no code change): competitions, sponsors, checkpoints, seat cap, notes, consent text, reminder templates.
+Competitions/sponsors fall back to the static placeholders in `lib/content.ts` / `lib/sponsors.ts` while their tables are empty.

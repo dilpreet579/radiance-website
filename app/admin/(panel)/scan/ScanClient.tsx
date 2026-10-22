@@ -5,6 +5,7 @@ import { scan } from "./actions";
 import type { ScanResult } from "@/lib/scan";
 
 type Opt = { key?: string; id?: string; label?: string; name?: string };
+// sessions come as {key,label}, checkpoints as {id,name}
 
 const COLORS = { ok: "bg-green-700", already: "bg-amber-600", ineligible: "bg-red-700", notfound: "bg-red-700", error: "bg-red-700" } as const;
 
@@ -17,7 +18,7 @@ export default function ScanClient({ sessions, checkpoints }: { sessions: Opt[];
   const busy = useRef(false);
   const last = useRef({ t: "", at: 0 });
   const ctx = useRef({ session, cp });
-  ctx.current = { session, cp };
+  useEffect(() => { ctx.current = { session, cp }; }, [session, cp]);
 
   async function submit(token: string) {
     if (busy.current) return;

@@ -1,6 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
-import { getSettings, setSetting } from "@/lib/settings";
+import { getSettings, setSetting, type Consent } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
@@ -21,11 +21,8 @@ async function save(form: FormData) {
 
 const inp = "w-full rounded border border-fg/30 bg-white px-2 py-1.5 text-sm";
 
-export default async function Page() {
-  await requireAdmin("super");
-  const s = await getSettings();
-  const note = (k: string) => s.notes.find((n) => n.k === k)?.t ?? "";
-  const Consents = ({ list, prefix, title }: { list: typeof s.consents.nit; prefix: string; title: string }) => (
+function Consents({ list, prefix, title }: { list: Consent[]; prefix: string; title: string }) {
+  return (
     <fieldset className="grid gap-2 rounded-xl border border-fg/10 bg-cream-2 p-4">
       <legend className="px-1 font-semibold">{title}</legend>
       {list.map((c) => (
@@ -36,6 +33,12 @@ export default async function Page() {
       ))}
     </fieldset>
   );
+}
+
+export default async function Page() {
+  await requireAdmin("super");
+  const s = await getSettings();
+  const note = (k: string) => s.notes.find((n) => n.k === k)?.t ?? "";
   return (
     <form action={save} className="flex max-w-2xl flex-col gap-4">
       <h1 className="m-0 font-display text-3xl font-extrabold">Settings</h1>

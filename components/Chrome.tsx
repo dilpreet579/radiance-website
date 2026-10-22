@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NAV } from "@/lib/content";
 import { SponsorLine } from "./ui";
 import type { Sponsor } from "@/lib/sponsors";
@@ -10,8 +10,10 @@ import type { Sponsor } from "@/lib/sponsors";
 // Header + footer. Exhibition page swaps to the Halloween palette; /admin gets no chrome.
 export default function Chrome({ children, sponsor }: { children: React.ReactNode; sponsor: Sponsor }) {
   const path = usePathname();
-  const [open, setOpen] = useState(false);
-  useEffect(() => setOpen(false), [path]);
+  // menu is remembered per path, so navigating closes it without an effect
+  const [openAt, setOpenAt] = useState<string | null>(null);
+  const open = openAt === path;
+  const setOpen = (fn: (o: boolean) => boolean) => setOpenAt(fn(open) ? path : null);
   if (path.startsWith("/admin")) return <>{children}</>;
 
   const ex = path === "/exhibition";
