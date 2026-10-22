@@ -1,9 +1,14 @@
+import Image from "next/image";
 import { EX_DAYS, EX_SECTIONS } from "@/lib/content";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta("/exhibition", "Grand Exhibition · Halloween theme", "The Radiance 2026 Grand Exhibition at NIT Delhi, 4 and 5 November: a Halloween-themed showcase of photography, film and design. Open to everyone, no registration needed.");
 
-const photoCell = "flex aspect-[4/3] flex-col items-center justify-center gap-1.5 p-3 text-center font-mono text-xs uppercase tracking-[.12em] text-hw-lilac border border-[rgba(180,140,235,.35)] [background:repeating-linear-gradient(135deg,rgba(180,140,235,.14)_0_14px,rgba(180,140,235,.04)_14px_28px)]";
+const RADIANCE_2025_ITEMS = [
+  { label: "Exhibition", src: "/Exhibition-1.jpg" },
+  { label: "Photo booth", src: "/photobooth.jpeg" },
+  { label: "Performances", src: "/performance.jpeg" },
+];
 
 export default function Exhibition() {
   return (
@@ -46,11 +51,30 @@ export default function Exhibition() {
       </section>
 
       <section className="pb-[clamp(56px,8vw,112px)]">
-        <div className="wrap flex flex-col gap-5">
+        <div className="wrap flex flex-col gap-6">
           <div className="font-mono text-xs uppercase tracking-[.14em] text-hw-orange-2">Radiance 2025 exhibition</div>
-          <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))]">
-            {["Exhibition", "Photo booth", "Screening"].map((p) => (
-              <div key={p} className={photoCell}><span>{p}</span><span>placeholder photo</span></div>
+          <div className="grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]">
+            {RADIANCE_2025_ITEMS.map((item) => (
+              <div
+                key={item.label}
+                className="group relative flex flex-col overflow-hidden rounded-xl border border-[rgba(180,140,235,.35)] bg-[rgba(14,10,20,.75)] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-hw-orange"
+              >
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/40">
+                  <Image
+                    src={item.src}
+                    alt={item.label}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0E0A14] via-transparent to-transparent opacity-70" />
+                </div>
+                <div className="p-4 border-t border-[rgba(180,140,235,.2)]">
+                  <span className="font-spooky text-[24px] tracking-[.02em] text-[#F6E6D0] group-hover:text-hw-orange transition-colors">
+                    {item.label}
+                  </span>
+                </div>
+              </div>
             ))}
           </div>
         </div>

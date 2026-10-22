@@ -21,12 +21,6 @@ export default function Chrome({ children, sponsor }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen flex-col" style={{ background: ex ? "#0E0A14" : "#2E070B" }}>
-      <div className="border-b border-cream/10 bg-ink">
-        <div className="wrap flex justify-center py-2">
-          <SponsorLine sponsor={sponsor} />
-        </div>
-      </div>
-
       <header
         className="sticky top-0 z-50 border-b border-cream/[.14] backdrop-blur-[10px]"
         style={{ background: ex ? "rgba(14,10,20,.92)" : "rgba(46,7,11,.92)" }}

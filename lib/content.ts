@@ -65,7 +65,7 @@ export const SCHEDULE = [
 // admin-editable later (settings table)
 export const NOTES = [
   { k: "Refreshments", t: "Provided to attendees of the inaugural ceremony and all four workshops." },
-  { k: "SRHC campus bus", t: "NIT Delhi students based at the SRHC campus get a separate bus at 7:45 PM on 26, 27, 28, 29 and 30 Oct." },
+  { k: "SRHC campus bus", t: "Transport arrangement will be made for NIT Delhi students based at the SRHC campus." },
 ];
 
 export const STATS = [
@@ -77,24 +77,36 @@ export const STATS = [
 export const DISCIPLINES = ["Photography", "Filmmaking", "Motion Design", "Graphic Design"];
 export const SPEAKERS = ["Ayush Kumar Tripathi", "Gaurav Doliya", "Shivam", "Anurag Roy", "Nitin Chandra"];
 export const COLLABS = [
-  { n: "Dice Academy", s: "logo" },
-  { n: "Olympus Cameras", s: "logo" },
-  { n: "Unstop", s: "logo" },
-  { n: "Fabs", s: "Kirori Mal College, DU" },
-  { n: "Pixels", s: "Hansraj College, DU" },
+  { n: "Dice Academy", s: "Media & Design Institute", logo: "/dice.png" },
+  { n: "OM SYSTEM", s: "Optics & Imaging", logo: "/om.png" },
+  { n: "Unstop", s: "Opportunity Partner", logo: "/unstop.png" },
+  { n: "FAPS", s: "Kirori Mal College, DU", logo: "/faps.png" },
+  { n: "Pixels", s: "Hansraj College, DU", logo: "/pixels-bg.png" },
 ];
-export const SLIDES = ["Inaugural", "Workshops", "Photo walk", "Exhibition", "Winners"];
+export const SLIDES = [
+  { title: "Inaugural Ceremony", src: "/inaugral.jpg" },
+  { title: "Workshops", src: "/workshop-1.jpg" },
+  { title: "Workshops", src: "/workshop-2.jpg" },
+  { title: "Workshops", src: "/workshop-3.jpg" },
+  { title: "Workshops", src: "/workshop-4.JPG" },
+  { title: "Photo Walk", src: "/photowalk-1.jpg" },
+  { title: "Photo Walk", src: "/photowalk-2.jpg" },
+  { title: "Photo Walk", src: "/photowalk-out.png" },
+  { title: "Exhibition", src: "/Exhibition-1.jpg" },
+  { title: "Exhibition", src: "/Exhibition-2.jpg" },
+  { title: "Exhibition", src: "/Exhibition-3.jpg" },
+];
 
 export const WORKSHOPS = [
   { n: "01", date: "Tue 27 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Photography Workshop", by: "Powered by Nikon", speaker: "Manvindra", role: "Technical Officer", bio: "Manvindra is a veteran photographer with extensive experience in photography and visual storytelling. Powered by Nikon, this workshop brings expert insights into photography techniques, creative vision, and the art of capturing stunning images.", big: "Powered by", bigLabel: "", bigLogo: "/nikon.jpeg", points: [] as string[], social: "Speaker social links", url: "", photo: "/manvindra.jpg" },
-  { n: "02", date: "Wed 28 Oct", time: "3:30–6:30 PM · 3 hrs", title: "Cinematic Filmmaking Workshop", by: "By Shoot Guru", speaker: "Kshitij Sheetak · Shoot Guru", bio: "ShootGuru is a filmmaking and photography platform built to help aspiring creators learn through practical experiences, industry exposure and real-world creative projects. Through workshops, training sessions and creator-focused initiatives, ShootGuru aims to bridge the gap between learning the craft and actually working in the creative industry.", big: "207K", bigLabel: "Instagram followers", points: ["Cinematography", "Basic video editing", "Participants are split into crews and make a short film on a given topic", "The best film wins prizes"], social: "Shoot Guru on Instagram", url: "https://www.instagram.com/shootguru", photo: "/shootguru.jpg", role: "", bigLogo: "" },
+  { n: "02", date: "Wed 28 Oct", time: "3:30–6:30 PM · 3 hrs", title: "Cinematic Filmmaking Workshop", by: "By Shoot Guru", speaker: "Kshitij Sheetak · Shoot Guru", bio: "ShootGuru is a filmmaking and photography platform built to help aspiring creators learn through practical experiences, industry exposure and real-world creative projects. Through workshops, training sessions and creator-focused initiatives, ShootGuru aims to bridge the gap between learning the craft and actually working in the creative industry.", big: "200K+", bigLabel: "Instagram followers", points: ["Cinematography", "Basic video editing", "Participants are split into crews and make a short film on a given topic", "The best film wins prizes"], social: "Shoot Guru on Instagram", url: "https://www.instagram.com/shootguru", photo: "/shootguru.jpg", role: "", bigLogo: "" },
   { n: "03", date: "Thu 29 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Motion Design Workshop", by: "By Motion Nations", speaker: "Abhishek · Motion Nations", bio: "Abhishek is the creator behind Motion Nations, a YouTube channel with 350K+ subscribers, where he shares his expertise in motion design, animation, and creative workflows. Passionate about bringing visuals to life, he helps aspiring designers explore motion graphics, visual storytelling, and industry-relevant techniques.", big: "350K+", bigLabel: "YouTube subscribers", points: ["Motion Graphics & Animation", "Visual Storytelling", "Creative Workflows & Techniques"], social: "Motion Nations on YouTube", url: "https://www.youtube.com/@MotionNations", photo: "/abhishek.jpg", role: "", bigLogo: "" },
   { n: "04", date: "Fri 30 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Graphic Design Workshop", by: "By Gaurav Doliya", speaker: "Gaurav Doliya", bio: "Gaurav Doliya is a graphic and motion design educator with seven years of experience training students in Adobe tools, design process, and post-production. He currently leads as Academic Director at IRO Design Academy, focusing on practical briefs, critique, and portfolio development.", big: "Returning", bigLabel: "Past Radiance speaker", points: [] as string[], social: "Gaurav Doliya on Instagram", url: "", photo: "/gaurav-doliya.jpg", role: "", bigLogo: "" },
 ];
 
 export const INAUG_STEPS = [
-  { n: "01", t: "The format of Radiance", d: "How the eight days are organised and how the Universal Pass works." },
-  { n: "02", t: "The workshops line-up", d: "A walkthrough of the four workshops and their speakers." },
+  { n: "01", t: "Inaugration by Dignitaries", d: "Inaugration of the workshop done by our esteemed dignitaries along with there speeches." },
+  { n: "02", t: "Format and Lineup of Radiance", d: "Format of radiance explained along with its 8 days events, activities planned and major rules." },
   { n: "03", t: "Stand-up comedy by Vaibhav Karn", d: "The evening closes with a comedy show." },
 ];
 export const INAUG_FACTS = [
@@ -103,7 +115,7 @@ export const INAUG_FACTS = [
   { k: "Who can attend", v: "NIT Delhi students only" },
   { k: "Venue", v: "To be announced" },
   { k: "Refreshments", v: "Provided" },
-  { k: "SRHC campus bus", v: "7:45 PM" },
+  { k: "SRHC campus bus", v: "Arrangement will be made" },
 ];
 
 export const WALK_SESSIONS = [
