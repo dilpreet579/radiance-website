@@ -13,15 +13,9 @@ const sponsorStrip = (s: SponsorInfo, extra = "") =>
   `<div style="background:#2e070b;color:#f4e9d9;padding:12px 16px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;${extra}">Title Sponsor ${
     s.logo_url ? `<img src="${esc(s.logo_url)}" alt="" height="22" style="height:22px;vertical-align:middle;margin:0 8px">` : "· "
   }<b>${esc(s.name)}</b> · Radiance 2026, NIT Delhi</div>`;
-const footer = (s: SponsorInfo) => sponsorStrip(s, "margin-top:24px;border-radius:8px;");
 
 const MONO = "'Courier New',Courier,monospace";
 const logoImg = (extra = "") => `<img src="${siteUrl()}/email-logo.png" width="432" alt="Radiance 2026 · NIT Delhi" style="display:block;width:100%;max-width:432px;height:auto;${extra}">`;
-
-// Full HTML document (doctype, charset, title): well-formed markup scores better with spam filters than a bare <div>.
-const shell = (inner: string, s: SponsorInfo, title = "Radiance 2026") =>
-  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title></head><body style="margin:0;background:#f4e9d9">` +
-  `<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#f4e9d9;color:#2a0b0c">${logoImg("margin:0 0 20px;")}${inner}${footer(s)}</div></body></html>`;
 
 // Always send a plain-text part with the HTML: HTML-only mail is a classic spam signal.
 export async function sendMail(to: string, subject: string, html: string, text: string, attachments?: { filename: string; content: Buffer; contentId: string }[]) {
@@ -102,5 +96,25 @@ export function fillTemplate(tpl: string, v: Record<string, string>) {
   return tpl.replace(/\{(\w+)\}/g, (m, k) => v[k] ?? m);
 }
 
-export const reminderHtml = (body: string, s: SponsorInfo) =>
-  shell(body.split("\n").map((l) => (l.trim() ? `<p style="margin:0 0 12px">${esc(l)}</p>` : "")).join(""), s, "Radiance 2026 reminder");
+export type ReminderInfo = { day: string; event: string; venue: string; token: string };
+
+// Same look as the ticket email (maroon page, logo, gold label), with the admin-written body in the middle and the student's QR (inline, cid:qr) as the entry card.
+// Full HTML document (doctype, charset, title): well-formed markup scores better with spam filters than a bare <div>.
+export const reminderHtml = (body: string, s: SponsorInfo, r: ReminderInfo) => {
+  const date = new Date(`${r.day}T00:00:00+05:30`).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
+  const paras = body.split("\n").map((l) => (l.trim() ? `<p style="margin:0 0 12px;font-size:16px;line-height:1.45">${esc(l)}</p>` : "")).join("");
+  return (
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Radiance 2026 reminder</title></head>` +
+    `<body style="margin:0;background:#430b10"><div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#f4e9d9">` +
+    `<div style="background:#f4e9d9;border-radius:6px;padding:4px 10px">${logoImg()}</div>` +
+    `<div style="margin-top:24px;${label}color:#ebb65b">${esc(date)} · Reminder</div>` +
+    `<h1 style="margin:6px 0 4px;font-size:30px;line-height:1.1;color:#f4e9d9">${esc(r.event)}</h1>` +
+    `<div style="margin:0 0 18px;font-size:15px;color:#e8d6c4">${esc(r.venue)}</div>${paras}` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;background:#f4e9d9;color:#2a0b0c;border-radius:14px"><tr>` +
+    `<td width="140" style="padding:16px 0 16px 16px"><img src="cid:qr" width="112" height="112" alt="QR ${esc(r.token)}" style="display:block;width:112px;height:112px;border:1.5px solid #d4c8ba;border-radius:8px"></td>` +
+    `<td valign="middle" style="padding:16px"><div style="${label}">Token ID</div><div style="font-family:${MONO};font-size:22px;font-weight:bold;letter-spacing:.04em;margin:4px 0">${esc(r.token)}</div><div style="font-size:13px;color:#6b3a33">Show this at the entrance</div></td>` +
+    `</tr></table>` +
+    sponsorStrip(s, "margin-top:20px;border-radius:8px;") +
+    `</div></body></html>`
+  );
+};
