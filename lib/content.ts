@@ -141,6 +141,8 @@ export const WORKSHOP_OPTIONS = [
   { key: "motion", name: "Motion Design", d: "29 Oct · 5:30–7:30 PM" },
   { key: "graphic", name: "Graphic Design", d: "30 Oct · 5:30–7:30 PM" },
 ] as const;
+// Sessions that count toward photo walk selection.
+export const CORE = ["inaugural", "photo", "film", "motion", "graphic"] as const;
 export type WorkshopKey = (typeof WORKSHOP_OPTIONS)[number]["key"];
 
 // admin-editable later (settings table)
