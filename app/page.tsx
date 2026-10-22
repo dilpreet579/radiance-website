@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Carousel from "@/components/Carousel";
 import { LogoSlot, Notes, RegisterBtn } from "@/components/ui";
 import { COLLABS, DISCIPLINES, SCHEDULE, SPEAKERS, STATS } from "@/lib/content";
@@ -130,9 +131,9 @@ export default async function Home() {
             <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
               {COLLABS.map((c) => (
                 <div key={c.n} className="flex min-h-[136px] flex-col items-center justify-between gap-3 rounded-lg border border-fg/15 bg-cream/60 p-4 text-center transition-all hover:bg-cream hover:shadow-sm">
-                  <div className="flex h-12 w-full items-center justify-center">
+                  <div className="relative flex h-12 w-full max-w-[150px] items-center justify-center">
                     {"logo" in c && c.logo ? (
-                      <img src={c.logo} alt={c.n} className="max-h-14 max-w-[150px] object-contain" />
+                      <Image src={c.logo} alt={c.n} fill sizes="150px" className="object-contain" />
                     ) : (
                       <span className="font-display text-lg font-bold leading-[1.15]">{c.n}</span>
                     )}
