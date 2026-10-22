@@ -1,20 +1,35 @@
 import PageHeader from "@/components/PageHeader";
 import { CAMPUS_COMPS, ONLINE_COMPS } from "@/lib/content";
+import { db, hasDb } from "@/lib/db";
+import { getSettings } from "@/lib/settings";
 
-// Flip to true on 26 Oct. Moves to an admin toggle + DB table (links, deadlines) in the admin phase.
-const LIVE = process.env.NEXT_PUBLIC_COMPETITIONS_LIVE === "true";
+export const revalidate = 60;
 
-type Comp = (typeof ONLINE_COMPS)[number];
+type Comp = { kind: "online" | "campus"; genre: string; title: string; desc: string; prize: string; theme: string; deadline: string; url: string; live: boolean };
 
-function Card({ c, campus, label }: { c: Comp; campus?: boolean; label: string }) {
+// Admin-managed rows win; with an empty table, show the placeholder competitions.
+async function load(globalLive: boolean): Promise<Comp[]> {
+  if (hasDb()) {
+    try {
+      const { data } = await db().from("competitions").select("*").order("position");
+      if (data?.length) return data.map((r) => ({ ...r, desc: r.description }));
+    } catch {}
+  }
+  const ph = (kind: Comp["kind"]) => (c: (typeof ONLINE_COMPS)[number]): Comp => ({ kind, ...c, theme: "See the competition page", deadline: "3 Nov, 11:59 PM", url: "#", live: globalLive });
+  return [...ONLINE_COMPS.map(ph("online")), ...CAMPUS_COMPS.map(ph("campus"))];
+}
+
+function Card({ c }: { c: Comp }) {
+  const campus = c.kind === "campus";
   const soon = "Announced 26 Oct";
+  const live = c.live && !!c.url;
   const rows: [string, string][] = [
-    ["Prize", LIVE ? c.prize : soon],
-    ["Theme", LIVE ? "See the competition page" : soon],
-    ["Deadline", LIVE ? "3 Nov, 11:59 PM" : soon],
+    ["Prize", live ? c.prize : soon],
+    ["Theme", live ? c.theme || "—" : soon],
+    ["Deadline", live ? c.deadline || "—" : soon],
   ];
   const btnBase = "btn px-[22px] py-3.5 text-base";
-  const btn = LIVE
+  const btn = live
     ? `${btnBase} ${campus ? "btn-gold" : "btn-rust"}`
     : `${btnBase} pointer-events-none border-[1.5px] border-dashed ${campus ? "border-cream/45 text-muted" : "border-fg/40 text-fg-3"}`;
   return (
@@ -30,8 +45,9 @@ function Card({ c, campus, label }: { c: Comp; campus?: boolean; label: string }
           </div>
         ))}
       </div>
-      {/* ponytail: link is "#" until admin-editable URLs land in the DB phase */}
-      <a href={LIVE ? "#" : undefined} className={btn}>{LIVE ? label : "Coming soon"}</a>
+      <a href={live ? c.url : undefined} target={live ? "_blank" : undefined} rel="noreferrer" className={btn}>
+        {live ? (campus ? "Open Google Form ↗" : "Go to Unstop ↗") : "Coming soon"}
+      </a>
     </div>
   );
 }
@@ -48,23 +64,26 @@ function Group({ title, sub, children }: { title: string; sub: string; children:
   );
 }
 
-export default function Competitions() {
+export default async function Competitions() {
+  const s = await getSettings();
+  const comps = await load(s.competitions_live);
+  const anyLive = comps.some((c) => c.live && c.url);
   return (
     <>
       <PageHeader path="/competitions" />
       <main className="bg-panel pb-[clamp(56px,8vw,112px)] pt-[clamp(40px,6vw,80px)]">
         <div className="wrap flex flex-col gap-[clamp(40px,6vw,72px)]">
           <div className="flex flex-wrap items-center gap-x-[18px] gap-y-2 rounded-lg border border-gold/60 bg-gold/[.08] px-[22px] py-4">
-            <span className="eyebrow">{LIVE ? "Live now" : "Coming soon"}</span>
+            <span className="eyebrow">{anyLive ? "Live now" : "Coming soon"}</span>
             <span className="text-base">
-              {LIVE ? "Competition links are live. Submit your entries before the deadlines." : "Competitions go live on 26 Oct, the inaugural day. Links and details appear here."}
+              {anyLive ? "Competition links are live. Submit your entries before the deadlines." : "Competitions go live on 26 Oct, the inaugural day. Links and details appear here."}
             </span>
           </div>
           <Group title="Online on Unstop" sub="All-India · free · open to all students">
-            {ONLINE_COMPS.map((c) => <Card key={c.title} c={c} label="Go to Unstop ↗" />)}
+            {comps.filter((c) => c.kind === "online").map((c) => <Card key={c.title} c={c} />)}
           </Group>
           <Group title="In-campus" sub="NIT Delhi students only · submissions via Google Forms">
-            {CAMPUS_COMPS.map((c) => <Card key={c.title} c={c} campus label="Open Google Form ↗" />)}
+            {comps.filter((c) => c.kind === "campus").map((c) => <Card key={c.title} c={c} />)}
           </Group>
         </div>
       </main>

@@ -1,9 +1,13 @@
 import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
 import { Notes, Placeholder } from "@/components/ui";
-import { NOTES, WORKSHOPS } from "@/lib/content";
+import { WORKSHOPS } from "@/lib/content";
+import { getSettings } from "@/lib/settings";
 
-export default function Workshops() {
+export const revalidate = 60;
+
+export default async function Workshops() {
+  const { notes: NOTES, seat_cap } = await getSettings();
   return (
     <>
       <PageHeader path="/workshops" />
@@ -12,7 +16,7 @@ export default function Workshops() {
           <div className="flex flex-wrap items-center justify-between gap-5 rounded-lg bg-cream p-[clamp(22px,3vw,34px)] text-fg">
             <div className="flex basis-[380px] flex-1 flex-col gap-1.5">
               <div className="font-display text-2xl font-extrabold leading-[1.15]">One registration covers every workshop</div>
-              <div className="text-base text-fg-2">NIT Delhi students get the Universal Pass. Outside students pick their workshops on the registration page, 15 seats per workshop.</div>
+              <div className="text-base text-fg-2">NIT Delhi students get the Universal Pass. Outside students pick their workshops on the registration page, {seat_cap} seats per workshop.</div>
             </div>
             <Link href="/register" className="btn btn-rust px-[26px] py-3.5 text-base">Go to registration <span>→</span></Link>
           </div>

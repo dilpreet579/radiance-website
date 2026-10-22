@@ -1,30 +1,31 @@
 import Link from "next/link";
+import type { Sponsor } from "@/lib/sponsors";
 
-// Hatched stand-in until the BPCL logo is supplied (admin sponsors table later).
-export function LogoSlot({ w = 56, h = 22, dark = true }: { w?: number; h?: number; dark?: boolean }) {
-  const c = dark ? "244,233,217" : "168,46,23";
+// Shows the sponsor's logo, or a hatched stand-in until the logo is supplied.
+export function LogoSlot({ w = 56, h = 22, logo }: { w?: number; h?: number; logo?: string }) {
+  if (logo) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={logo} alt="" style={{ height: h, maxWidth: w * 2, objectFit: "contain" }} />;
+  }
   return (
     <span
       style={{
         width: w,
         height: h,
         display: "inline-block",
-        border: `1px dashed rgba(${c},.5)`,
-        background: `repeating-linear-gradient(135deg,rgba(${c},.16) 0 6px,transparent 6px 12px)`,
+        border: "1px dashed rgba(244,233,217,.5)",
+        background: "repeating-linear-gradient(135deg,rgba(244,233,217,.16) 0 6px,transparent 6px 12px)",
       }}
     />
   );
 }
 
-export function SponsorLine({ size = 12 }: { size?: number }) {
+export function SponsorLine({ sponsor, size = 12 }: { sponsor: Sponsor; size?: number }) {
   return (
-    <div
-      className="flex items-center gap-3 font-mono uppercase tracking-[.12em] text-muted"
-      style={{ fontSize: size }}
-    >
+    <div className="flex items-center gap-3 font-mono uppercase tracking-[.12em] text-muted" style={{ fontSize: size }}>
       <span>Title Sponsor</span>
-      <LogoSlot />
-      <span className="text-cream">Bharat Petroleum</span>
+      <LogoSlot logo={sponsor.logo_url} />
+      <span className="text-cream">{sponsor.name}</span>
     </div>
   );
 }

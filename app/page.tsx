@@ -1,9 +1,14 @@
 import Link from "next/link";
 import Carousel from "@/components/Carousel";
 import { LogoSlot, Notes, RegisterBtn } from "@/components/ui";
-import { COLLABS, DISCIPLINES, NOTES, SCHEDULE, SPEAKERS, STATS } from "@/lib/content";
+import { COLLABS, DISCIPLINES, SCHEDULE, SPEAKERS, STATS } from "@/lib/content";
+import { getSettings } from "@/lib/settings";
+import { getAssociateSponsors, getTitleSponsor } from "@/lib/sponsors";
 
-export default function Home() {
+export const revalidate = 60;
+
+export default async function Home() {
+  const [sponsor, associates, { notes }] = await Promise.all([getTitleSponsor(), getAssociateSponsors(), getSettings()]);
   return (
     <main>
       <section className="pattern-bg pb-[clamp(56px,8vw,104px)] pt-[clamp(40px,6vw,80px)]">
@@ -22,8 +27,8 @@ export default function Home() {
             <div className="font-display text-[clamp(34px,5vw,56px)] font-extrabold leading-none tracking-[-.02em] text-gold">26 Oct – 5 Nov</div>
             <div className="flex items-center gap-3 text-[15px] text-soft">
               <span>In association with</span>
-              <LogoSlot h={24} />
-              <span className="font-bold text-cream">Bharat Petroleum</span>
+              <LogoSlot h={24} logo={sponsor.logo_url} />
+              <span className="font-bold text-cream">{sponsor.name}</span>
               <span className="rounded-[3px] border border-gold/60 px-2 py-[3px] font-mono text-[11px] uppercase tracking-[.12em] text-gold">Title Sponsor</span>
             </div>
           </div>
@@ -88,7 +93,7 @@ export default function Home() {
               </Link>
             ))}
           </div>
-          <div className="mt-7"><Notes items={NOTES} /></div>
+          <div className="mt-7"><Notes items={notes} /></div>
         </div>
       </section>
 
@@ -97,13 +102,31 @@ export default function Home() {
           <div className="grid items-center gap-[clamp(28px,5vw,72px)] [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
             <div className="flex flex-col gap-5">
               <div className="eyebrow !text-rust">Title Sponsor</div>
-              <h2 className="h2">Radiance 2026 is proudly presented by Bharat Petroleum</h2>
-              <a href="https://www.bharatpetroleum.in" className="inline-flex gap-2 font-bold !text-rust hover:!text-fg">Visit Bharat Petroleum <span>↗</span></a>
+              <h2 className="h2">{sponsor.tagline}</h2>
+              {sponsor.link && <a href={sponsor.link} className="inline-flex gap-2 font-bold !text-rust hover:!text-fg">Visit {sponsor.name} <span>↗</span></a>}
             </div>
-            <div className="grid aspect-video place-items-center border-[1.5px] border-dashed border-rust/55 p-4 text-center font-mono text-xs uppercase tracking-[.12em] text-rust-dk [background:repeating-linear-gradient(135deg,rgba(168,46,23,.1)_0_12px,rgba(168,46,23,.03)_12px_24px)]">
-              <span>Bharat Petroleum logo<br />high-res file to be supplied</span>
-            </div>
+            {sponsor.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={sponsor.logo_url} alt={sponsor.name} className="aspect-video w-full object-contain" />
+            ) : (
+              <div className="grid aspect-video place-items-center border-[1.5px] border-dashed border-rust/55 p-4 text-center font-mono text-xs uppercase tracking-[.12em] text-rust-dk [background:repeating-linear-gradient(135deg,rgba(168,46,23,.1)_0_12px,rgba(168,46,23,.03)_12px_24px)]">
+                <span>{sponsor.name} logo<br />high-res file to be supplied</span>
+              </div>
+            )}
           </div>
+          {associates.length > 0 && (
+            <div className="flex flex-col gap-[22px] border-t border-fg/20 pt-[clamp(32px,4vw,48px)]">
+              <div className="eyebrow !text-rust">Associate sponsors</div>
+              <div className="flex flex-wrap gap-x-10 gap-y-4">
+                {associates.map((a) => (
+                  <a key={a.name} href={a.link || undefined} className="font-display text-xl font-bold !text-fg">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    {a.logo_url ? <img src={a.logo_url} alt={a.name} className="h-12 object-contain" /> : a.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex flex-col gap-[22px] border-t border-fg/20 pt-[clamp(32px,4vw,48px)]">
             <div className="eyebrow !text-rust">Past collaborators</div>
             <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(170px,1fr))]">

@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NAV } from "@/lib/content";
 import { SponsorLine } from "./ui";
+import type { Sponsor } from "@/lib/sponsors";
 
 // Header + footer. Exhibition page swaps to the Halloween palette; /admin gets no chrome.
-export default function Chrome({ children }: { children: React.ReactNode }) {
+export default function Chrome({ children, sponsor }: { children: React.ReactNode; sponsor: Sponsor }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [path]);
@@ -20,7 +21,7 @@ export default function Chrome({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen flex-col" style={{ background: ex ? "#0E0A14" : "#2E070B" }}>
       <div className="border-b border-cream/10 bg-ink">
         <div className="wrap flex justify-center py-2">
-          <SponsorLine />
+          <SponsorLine sponsor={sponsor} />
         </div>
       </div>
 
@@ -87,7 +88,7 @@ export default function Chrome({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-cream/[.14] pt-[22px] font-mono text-xs uppercase tracking-[.12em] text-muted">
-            <SponsorLine />
+            <SponsorLine sponsor={sponsor} />
             <span>NIT Delhi · 26 Oct – 5 Nov 2026</span>
           </div>
         </div>
