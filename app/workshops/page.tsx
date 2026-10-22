@@ -37,10 +37,6 @@ export default async function Workshops() {
                     sizes="(max-width: 700px) 100vw, 800px"
                     quality={90}
                   />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-5 pb-5 pt-10">
-                    <div className="font-display text-xl font-bold text-white">{w.speaker}</div>
-                    {"role" in w && <div className="font-mono text-xs uppercase tracking-[.12em] text-gold">{(w as { role?: string }).role}</div>}
-                  </div>
                 </div>
               ) : (
                 <Placeholder label={w.photo} className={`aspect-[4/5] max-h-[560px] w-full ${i % 2 ? "min-[700px]:order-2" : ""}`} />
@@ -48,16 +44,15 @@ export default async function Workshops() {
               <div className="flex flex-col gap-5">
                 <div className="font-mono text-[13px] uppercase tracking-[.14em] text-gold">Workshop {w.n} · {w.date}</div>
                 <h2 className="m-0 text-balance font-display text-[clamp(34px,4.6vw,60px)] font-extrabold leading-none tracking-[-.02em]">{w.title}</h2>
-                
                 <div className="flex flex-wrap gap-2">
                   {[w.time, "NIT Delhi + outside (limited)"].map((c) => <span key={c} className="chip !px-3.5 !py-1.5">{c}</span>)}
                 </div>
                 <div className="flex items-center gap-4 border-y border-cream/20 py-[18px]">
                   <span className="font-display text-[clamp(28px,4vw,44px)] font-extrabold leading-none tracking-[-.02em] text-gold">{w.big}</span>
-                  {"bigLogo" in w && (w as { bigLogo?: string }).bigLogo ? (
+                  {w.bigLogo ? (
                     <div className="relative h-10 w-28 overflow-hidden rounded-md shadow-md">
                       <Image
-                        src={(w as { bigLogo: string }).bigLogo}
+                        src={w.bigLogo}
                         alt="Nikon Logo"
                         fill
                         className="object-cover"
@@ -69,7 +64,7 @@ export default async function Workshops() {
                 </div>
                 <div>
                   <div className="font-display text-[22px] font-bold">{w.speaker}</div>
-                  {"role" in w && <div className="mb-1 font-mono text-xs uppercase tracking-[.12em] text-gold">{(w as { role?: string }).role}</div>}
+                  {w.role && <div className="mb-1 font-mono text-xs uppercase tracking-[.12em] text-gold">{w.role}</div>}
                   <p className="mb-0 mt-1.5 text-pretty text-soft">{w.bio}</p>
                 </div>
                 {w.points.length > 0 && (
