@@ -32,7 +32,8 @@ export default async function Workshops() {
                     fill
                     className="object-cover"
                     style={{ objectPosition: "center 40%" }}
-                    sizes="(max-width: 700px) 100vw, 50vw"
+                    sizes="(max-width: 700px) 100vw, 800px"
+                    quality={90}
                   />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-5 pb-5 pt-10">
                     <div className="font-display text-xl font-bold text-white">{w.speaker}</div>
