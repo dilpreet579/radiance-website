@@ -9,6 +9,15 @@ export const NAV = [
   ["/exhibition", "Exhibition"],
 ] as const;
 
+export const CONTACT = {
+  email: "clairvoyance@nitdelhi.ac.in",
+  socials: [
+    ["Instagram", "https://www.instagram.com/clairvoyance_nitd/"],
+    ["YouTube", "https://www.youtube.com/@clairvoyanceNITD"],
+    ["LinkedIn", "https://in.linkedin.com/in/clairvoyance"],
+  ],
+} as const;
+
 export const PAGE_META: Record<string, { eyebrow: string; title: string; lead: string; chips: string[] }> = {
   "/workshops": {
     eyebrow: "Workshops · 27–30 Oct",

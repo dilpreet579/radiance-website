@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { NAV } from "@/lib/content";
+import { CONTACT, NAV } from "@/lib/content";
 import { SponsorLine } from "./ui";
 import type { Sponsor } from "@/lib/sponsors";
 
@@ -83,9 +83,9 @@ export default function Chrome({ children, sponsor }: { children: React.ReactNod
             </div>
             <div className="flex flex-col gap-2">
               <div className="eyebrow mb-1">Contact</div>
-              <div className="text-[15px] text-muted">Contact details to be added</div>
+              <a href={`mailto:${CONTACT.email}`} className="text-[15px] text-muted hover:text-gold">{CONTACT.email}</a>
               <div className="mt-1.5 flex gap-4 text-[15px] font-semibold">
-                <a href="#">Instagram</a><a href="#">YouTube</a><a href="#">LinkedIn</a>
+                {CONTACT.socials.map(([name, url]) => <a key={name} href={url} target="_blank" rel="noopener noreferrer">{name}</a>)}
               </div>
             </div>
           </div>
