@@ -27,11 +27,12 @@ export default async function Inaugural() {
               ))}
             </div>
             <div className="flex flex-wrap gap-6 rounded-lg border border-cream/25 bg-ink/35 p-5">
-              <div className="placeholder grid aspect-[3/4] basis-[150px] place-items-center p-2 text-center font-mono text-[11px] uppercase tracking-[.1em]">Vaibhav Kant<br />placeholder photo</div>
+              <div className="placeholder grid aspect-[3/4] basis-[150px] place-items-center p-2 text-center font-mono text-[11px] uppercase tracking-[.1em]">Vaibhav Karn<br />placeholder photo</div>
               <div className="flex basis-[220px] flex-1 flex-col gap-2">
                 <div className="eyebrow">Stand-up comedy</div>
-                <div className="font-display text-[32px] font-extrabold leading-[1.05]">Vaibhav Kant</div>
+                <div className="font-display text-[32px] font-extrabold leading-[1.05]">Vaibhav Karn</div>
                 <p className="m-0 text-base text-soft">Short bio to be added. The comedy show is for NIT Delhi students only, and the show guidelines are accepted at registration.</p>
+                <a href="https://www.instagram.com/vaibhavkarn_here" target="_blank" rel="noopener noreferrer" className="inline-flex gap-2 text-[15px] font-bold">Vaibhav Karn on Instagram <span>↗</span></a>
               </div>
             </div>
           </div>

@@ -52,10 +52,10 @@ export const PAGE_META: Record<string, { eyebrow: string; title: string; lead: s
 };
 
 export const SCHEDULE = [
-  { day: "26", mon: "Oct", dow: "Mon", title: "Inaugural Ceremony", sub: "Plus stand-up comedy by Vaibhav Kant", time: "5:30–7:30 PM", who: "NIT Delhi only", href: "/inaugural" },
+  { day: "26", mon: "Oct", dow: "Mon", title: "Inaugural Ceremony", sub: "Plus stand-up comedy by Vaibhav Karn", time: "5:30–7:30 PM", who: "NIT Delhi only", href: "/inaugural" },
   { day: "27", mon: "Oct", dow: "Tue", title: "Photography Workshop", sub: "Powered by Nikon", time: "5:30–7:30 PM · 2 hrs", who: "NIT Delhi + outside (limited)", href: "/workshops" },
   { day: "28", mon: "Oct", dow: "Wed", title: "Cinematic Filmmaking Workshop", sub: "By Shoot Guru", time: "3:30–6:30 PM · 3 hrs", who: "NIT Delhi + outside (limited)", href: "/workshops" },
-  { day: "29", mon: "Oct", dow: "Thu", title: "Motion Design Workshop", sub: "By Motion Nation (Abhishek)", time: "5:30–7:30 PM · 2 hrs", who: "NIT Delhi + outside (limited)", href: "/workshops" },
+  { day: "29", mon: "Oct", dow: "Thu", title: "Motion Design Workshop", sub: "By Motion Nations (Abhishek)", time: "5:30–7:30 PM · 2 hrs", who: "NIT Delhi + outside (limited)", href: "/workshops" },
   { day: "30", mon: "Oct", dow: "Fri", title: "Graphic Design Workshop", sub: "By Gaurav Dholia", time: "5:30–7:30 PM · 2 hrs", who: "NIT Delhi + outside (limited)", href: "/workshops" },
   { day: "31", mon: "Oct", dow: "Sat", title: "Delhi Photo Walk", sub: "Multi-location, by institute bus", time: "Entire day", who: "90 selected NIT Delhi students", href: "/photowalk" },
   { day: "4", mon: "Nov", dow: "Wed", title: "Grand Exhibition, Day 1", sub: "Halloween theme", time: "3:30–10:00 PM", who: "Everyone · no registration", href: "/exhibition" },
@@ -86,16 +86,16 @@ export const COLLABS = [
 export const SLIDES = ["Inaugural", "Workshops", "Photo walk", "Exhibition", "Winners"];
 
 export const WORKSHOPS = [
-  { n: "01", date: "Tue 27 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Photography Workshop", by: "Powered by Nikon", speaker: "Speaker to be announced", bio: "The speaker name and bio for the Nikon-powered photography workshop will be added here.", big: "Nikon", bigLabel: "Powered by", points: [] as string[], social: "Speaker social links", photo: "Nikon speaker" },
-  { n: "02", date: "Wed 28 Oct", time: "3:30–6:30 PM · 3 hrs", title: "Cinematic Filmmaking Workshop", by: "By Shoot Guru", speaker: "Shoot Guru", bio: "Shoot Guru teaches cinematography and basic video editing and has 207K followers on Instagram.", big: "207K", bigLabel: "Instagram followers", points: ["Cinematography", "Basic video editing", "Participants are split into crews and make a short film on a given topic", "The best film wins prizes"], social: "Shoot Guru on Instagram", photo: "Shoot Guru" },
-  { n: "03", date: "Thu 29 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Motion Design Workshop", by: "By Motion Nation", speaker: "Abhishek · Motion Nation", bio: "Abhishek runs Motion Nation, a YouTube channel with 250K+ subscribers, and teaches motion designing.", big: "250K+", bigLabel: "YouTube subscribers", points: ["Motion designing"], social: "Motion Nation on YouTube", photo: "Abhishek" },
-  { n: "04", date: "Fri 30 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Graphic Design Workshop", by: "By Gaurav Dholia", speaker: "Gaurav Dholia", bio: "Gaurav Dholia is an expert graphic designer with many years of experience. He also spoke at a previous Radiance.", big: "Returning", bigLabel: "Past Radiance speaker", points: [] as string[], social: "Gaurav Dholia on Instagram", photo: "Gaurav Dholia" },
+  { n: "01", date: "Tue 27 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Photography Workshop", by: "Powered by Nikon", speaker: "Speaker to be announced", bio: "The speaker name and bio for the Nikon-powered photography workshop will be added here.", big: "Nikon", bigLabel: "Powered by", points: [] as string[], social: "Speaker social links", url: "", photo: "Nikon speaker" },
+  { n: "02", date: "Wed 28 Oct", time: "3:30–6:30 PM · 3 hrs", title: "Cinematic Filmmaking Workshop", by: "By Shoot Guru", speaker: "Kshitij Sheetak · Shoot Guru", bio: "Kshitij Sheetak of Shoot Guru teaches cinematography and basic video editing. Shoot Guru has 207K followers on Instagram.", big: "207K", bigLabel: "Instagram followers", points: ["Cinematography", "Basic video editing", "Participants are split into crews and make a short film on a given topic", "The best film wins prizes"], social: "Shoot Guru on Instagram", url: "https://www.instagram.com/shootguru", photo: "Kshitij Sheetak" },
+  { n: "03", date: "Thu 29 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Motion Design Workshop", by: "By Motion Nations", speaker: "Abhishek · Motion Nations", bio: "Abhishek runs Motion Nations, a YouTube channel with 250K+ subscribers, and teaches motion designing.", big: "250K+", bigLabel: "YouTube subscribers", points: ["Motion designing"], social: "Motion Nations on YouTube", url: "https://www.youtube.com/@MotionNations", photo: "Abhishek" },
+  { n: "04", date: "Fri 30 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Graphic Design Workshop", by: "By Gaurav Dholia", speaker: "Gaurav Dholia", bio: "Gaurav Dholia is an expert graphic designer with many years of experience. He also spoke at a previous Radiance.", big: "Returning", bigLabel: "Past Radiance speaker", points: [] as string[], social: "Gaurav Dholia on Instagram", url: "", photo: "Gaurav Dholia" },
 ];
 
 export const INAUG_STEPS = [
   { n: "01", t: "The format of Radiance", d: "How the eight days are organised and how the Universal Pass works." },
   { n: "02", t: "The workshops line-up", d: "A walkthrough of the four workshops and their speakers." },
-  { n: "03", t: "Stand-up comedy by Vaibhav Kant", d: "The evening closes with a comedy show." },
+  { n: "03", t: "Stand-up comedy by Vaibhav Karn", d: "The evening closes with a comedy show." },
 ];
 export const INAUG_FACTS = [
   { k: "Date", v: "Monday 26 Oct" },
