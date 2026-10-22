@@ -39,7 +39,7 @@ export async function sendDay(day: string): Promise<{ sent: number; failed: numb
     if (already.has(r.email)) { skipped++; continue; }
     const m = renderReminder(t, r, sponsor);
     try {
-      await sendMail(r.email, m.subject, m.html);
+      await sendMail(r.email, m.subject, m.html, m.text);
       await sb.from("reminder_log").insert({ day, email: r.email, ok: true });
       sent++;
     } catch (e) {
@@ -54,6 +54,6 @@ export async function sendTest(day: string, to: string) {
   const { data: t } = await db().from("reminder_templates").select("*").eq("day", day).maybeSingle();
   if (!t) throw new Error("No template for that day");
   const m = renderReminder(t, { name: "Test Student", email: to, token: "RAD26-0000" }, await getTitleSponsor());
-  await sendMail(to, "[TEST] " + m.subject, m.html);
+  await sendMail(to, "[TEST] " + m.subject, m.html, m.text);
   await db().from("reminder_log").insert({ day, email: to, ok: true, test: true });
 }

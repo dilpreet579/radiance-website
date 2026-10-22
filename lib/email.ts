@@ -13,13 +13,17 @@ const footer = (s: SponsorInfo) =>
     s.logo_url ? `<img src="${esc(s.logo_url)}" alt="" height="22" style="height:22px;vertical-align:middle;margin:0 8px">` : "· "
   }<b>${esc(s.name)}</b> · Radiance 2026, NIT Delhi</div>`;
 
-const shell = (inner: string, s: SponsorInfo) =>
-  `<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#f4e9d9;color:#2a0b0c">${inner}${footer(s)}</div>`;
+// Full HTML document (doctype, charset, title): well-formed markup scores better with spam filters than a bare <div>.
+const shell = (inner: string, s: SponsorInfo, title = "Radiance 2026") =>
+  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title></head><body style="margin:0;background:#f4e9d9">` +
+  `<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#f4e9d9;color:#2a0b0c">${inner}${footer(s)}</div></body></html>`;
 
-export async function sendMail(to: string, subject: string, html: string) {
+// Always send a plain-text part with the HTML: HTML-only mail is a classic spam signal.
+export async function sendMail(to: string, subject: string, html: string, text: string) {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY missing");
-  const { error } = await new Resend(key).emails.send({ from: FROM, to, subject, html });
+  if (FROM.includes("resend.dev") && process.env.NODE_ENV === "production") console.warn("EMAIL_FROM is still the Resend sandbox sender; verify a domain.");
+  const { error } = await new Resend(key).emails.send({ from: FROM, to, subject, html, text, replyTo: process.env.EMAIL_REPLY_TO || undefined });
   if (error) throw new Error(error.message);
 }
 
@@ -27,6 +31,19 @@ export type TicketInfo = { token: string; name: string; type: string; institute:
 
 export function sendTicket(to: string, t: TicketInfo, dup = false) {
   const ws = t.workshops.length ? `<p style="margin:8px 0"><b>Workshops:</b> ${t.workshops.map(esc).join(", ")}</p>` : "";
+  const text = [
+    "Radiance 2026 · NIT Delhi",
+    dup ? "You have already registered. Here is your ticket again." : "You are registered.",
+    "",
+    `${t.name} (${t.institute}, ${t.roll})`,
+    t.type + (t.workshops.length ? ` · Workshops: ${t.workshops.join(", ")}` : ""),
+    `Token ID: ${t.token}`,
+    `QR code: ${siteUrl()}/api/qr/${encodeURIComponent(t.token)}`,
+    "",
+    "Take a screenshot of this ticket or keep this email handy; you'll need to show the QR / token at every event.",
+    "",
+    `Title Sponsor: ${t.sponsor.name}`,
+  ].join("\n");
   return sendMail(
     to,
     "Your Radiance 2026 ticket",
@@ -41,7 +58,8 @@ export function sendTicket(to: string, t: TicketInfo, dup = false) {
         <div style="font-family:monospace;font-size:20px;letter-spacing:.04em">${esc(t.token)}</div>
       </div>
       ${ws}
-      <p style="font-size:14px">Take a screenshot of this ticket or keep this email handy; you'll need to show the QR / token at every event.</p>`, t.sponsor),
+      <p style="font-size:14px">Take a screenshot of this ticket or keep this email handy; you'll need to show the QR / token at every event.</p>`, t.sponsor, "Your Radiance 2026 ticket"),
+    text,
   );
 }
 
@@ -50,4 +68,4 @@ export function fillTemplate(tpl: string, v: Record<string, string>) {
 }
 
 export const reminderHtml = (body: string, s: SponsorInfo) =>
-  shell(body.split("\n").map((l) => (l.trim() ? `<p style="margin:0 0 12px">${esc(l)}</p>` : "")).join(""), s);
+  shell(body.split("\n").map((l) => (l.trim() ? `<p style="margin:0 0 12px">${esc(l)}</p>` : "")).join(""), s, "Radiance 2026 reminder");
