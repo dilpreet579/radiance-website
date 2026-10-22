@@ -107,6 +107,7 @@ create table if not exists reminder_templates (
   workshop_key text,              -- for workshop days, outside students with this workshop also get it
   subject text not null,
   body text not null,             -- placeholders: {name} {token} {venue} {event}
+  notes text not null default '', -- extra notes appended to the body (refreshments, SRHC bus)
   event text not null,
   venue text not null default 'Venue to be announced'
 );

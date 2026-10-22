@@ -1,6 +1,8 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { getSettings, setSetting, type Consent } from "@/lib/settings";
+import { AForm } from "@/components/admin/Toast";
+import { Card, CardGrid, CardHead, Field, FieldGrid, PageTitle, btnP, input } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -10,44 +12,55 @@ async function save(form: FormData) {
   const s = await getSettings();
   const g = (k: string) => String(form.get(k) ?? "").trim();
   await setSetting("seat_cap", Math.max(0, Number(g("seat_cap")) || s.seat_cap));
+  await setSetting("venue", g("venue") || s.venue);
   await setSetting("notes", [
     { k: "Refreshments", t: g("refreshments") },
     { k: "SRHC campus bus", t: g("srhc") },
   ]);
-  const cons = (list: typeof s.consents.nit, prefix: string) => list.map((c) => ({ key: c.key, t: g(`${prefix}_${c.key}_t`) || c.t, d: g(`${prefix}_${c.key}_d`) || c.d }));
+  const cons = (list: Consent[], prefix: string) => list.map((c) => ({ key: c.key, t: c.t, d: g(`${prefix}_${c.key}`) || c.d }));
   await setSetting("consents", { nit: cons(s.consents.nit, "nit"), outside: cons(s.consents.outside, "out") });
   revalidatePath("/", "layout");
 }
 
-const inp = "w-full rounded border border-fg/30 bg-white px-2 py-1.5 text-sm";
-
-function Consents({ list, prefix, title }: { list: Consent[]; prefix: string; title: string }) {
-  return (
-    <fieldset className="grid gap-2 rounded-xl border border-fg/10 bg-cream-2 p-4">
-      <legend className="px-1 font-semibold">{title}</legend>
-      {list.map((c) => (
-        <div key={c.key} className="grid gap-1">
-          <input name={`${prefix}_${c.key}_t`} defaultValue={c.t} className={inp} />
-          <textarea name={`${prefix}_${c.key}_d`} rows={3} defaultValue={c.d} className={inp} />
-        </div>
-      ))}
-    </fieldset>
-  );
-}
+const area = `${input} resize-y leading-normal`;
 
 export default async function Page() {
-  await requireAdmin("super");
   const s = await getSettings();
   const note = (k: string) => s.notes.find((n) => n.k === k)?.t ?? "";
   return (
-    <form action={save} className="flex max-w-2xl flex-col gap-4">
-      <h1 className="m-0 font-display text-3xl font-extrabold">Settings</h1>
-      <label className="grid gap-1 text-sm font-semibold">Outside seats per workshop<input name="seat_cap" type="number" min={0} defaultValue={s.seat_cap} className={inp + " max-w-32"} /></label>
-      <label className="grid gap-1 text-sm font-semibold">Refreshments note<textarea name="refreshments" rows={2} defaultValue={note("Refreshments")} className={inp} /></label>
-      <label className="grid gap-1 text-sm font-semibold">SRHC campus bus note<textarea name="srhc" rows={2} defaultValue={note("SRHC campus bus")} className={inp} /></label>
-      <Consents list={s.consents.nit} prefix="nit" title="NIT Delhi undertakings" />
-      <Consents list={s.consents.outside} prefix="out" title="Outside student undertaking" />
-      <button className="btn btn-rust self-start px-6 py-3 text-base">Save settings</button>
-    </form>
+    <>
+      <PageTitle title="Settings" sub="Seat caps, venue text, notes shown on the website and consent wording."
+        actions={<button form="settings-form" className={btnP}>Save changes</button>} />
+      <AForm id="settings-form" action={save} messages={{ save: "Settings saved" }}>
+        <CardGrid>
+          <Card>
+            <CardHead title="Seats and venue" />
+            <FieldGrid>
+              <Field label="Outside seats per workshop"><input name="seat_cap" type="number" min={0} defaultValue={s.seat_cap} className={input} /></Field>
+              <Field label="Default venue text"><input name="venue" defaultValue={s.venue} className={input} /></Field>
+            </FieldGrid>
+          </Card>
+          <Card>
+            <CardHead title="Info notes" sub="Shown on the schedule, workshops and inaugural pages." />
+            <FieldGrid>
+              <Field label="SRHC campus bus note" wide><textarea name="srhc" rows={4} defaultValue={note("SRHC campus bus")} className={area} /></Field>
+              <Field label="Refreshments note" wide><textarea name="refreshments" rows={4} defaultValue={note("Refreshments")} className={area} /></Field>
+            </FieldGrid>
+          </Card>
+          <Card>
+            <CardHead title="Consent text · NIT Delhi" />
+            <FieldGrid>
+              {s.consents.nit.map((c) => <Field key={c.key} label={c.t} wide><textarea name={`nit_${c.key}`} rows={4} defaultValue={c.d} className={area} /></Field>)}
+            </FieldGrid>
+          </Card>
+          <Card>
+            <CardHead title="Consent text · outside students" />
+            <FieldGrid>
+              {s.consents.outside.map((c) => <Field key={c.key} label={c.t} wide><textarea name={`out_${c.key}`} rows={4} defaultValue={c.d} className={area} /></Field>)}
+            </FieldGrid>
+          </Card>
+        </CardGrid>
+      </AForm>
+    </>
   );
 }

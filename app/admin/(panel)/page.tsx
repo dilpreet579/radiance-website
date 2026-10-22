@@ -1,56 +1,72 @@
 import { db } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth";
 import { getSettings, seatsTaken } from "@/lib/settings";
 import { WORKSHOP_OPTIONS } from "@/lib/content";
+import { Bar, Card, PageTitle, btnP, btnS, monoHead } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 
-export default async function Dashboard() {
-  await requireAdmin("super");
+const dl = (type: string, session?: string) => `/admin/export?type=${type}${session ? `&session=${session}` : ""}`;
+
+export default async function Overview() {
   const sb = db();
-  const [{ data: regs }, { data: sessions }, { data: scans }, taken, s] = await Promise.all([
-    sb.from("registrations").select("is_nit"),
-    sb.from("sessions").select("key,label").order("position"),
-    sb.from("scans").select("session_key"),
+  const [{ data: regs }, { data: scans }, { data: cps }, taken, s] = await Promise.all([
+    sb.from("registrations").select("is_nit,workshops,walk_selected"),
+    sb.from("scans").select("session_key,scanned_at").order("scanned_at", { ascending: false }),
+    sb.from("checkpoints").select("id"),
     seatsTaken(),
     getSettings(),
   ]);
-  const nit = (regs ?? []).filter((r) => r.is_nit).length;
-  const count = (k: string) => (scans ?? []).filter((x) => x.session_key === k).length;
-  const card = "rounded-xl bg-cream-2 p-5 border border-fg/10";
+  const all = regs ?? [], nit = all.filter((r) => r.is_nit), out = all.filter((r) => !r.is_nit);
+  const cnt = (k: string) => (scans ?? []).filter((x) => x.session_key === k).length;
+  const eligible = (k: string) => nit.length + out.filter((r) => r.workshops.includes(k)).length;
+  const bars = [
+    ["Inaugural", "inaugural", nit.length],
+    ["Photography", "photo", eligible("photo")],
+    ["Filmmaking", "film", eligible("film")],
+    ["Motion Design", "motion", eligible("motion")],
+    ["Graphic Design", "graphic", eligible("graphic")],
+    ["Exhibition", "exhibition", all.length],
+  ] as const;
+  const walkSel = nit.filter((r) => r.walk_selected).length;
+  const boarded = cnt("walk");
+  const last = scans?.[0]?.scanned_at;
+  const stats: [string, number][] = [["Registrations", all.length], ["NIT Delhi · Universal Pass", nit.length], ["Outside · Workshop Pass", out.length], ["Scans recorded", scans?.length ?? 0]];
+
   return (
-    <div className="flex flex-col gap-8">
-      <p className="m-0 text-sm text-fg-3">Refresh the page to see the latest numbers.</p>
-      <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">
-        {[["Registrations", (regs ?? []).length], ["NIT Delhi (Universal)", nit], ["Outside (Workshop)", (regs ?? []).length - nit]].map(([l, v]) => (
-          <div key={l} className={card}><div className="font-display text-5xl font-extrabold text-rust">{v}</div><div className="font-semibold">{l}</div></div>
+    <>
+      <PageTitle title="Overview" sub="Counts update from the latest scans. Refresh to see the newest numbers."
+        actions={<>
+          <a href="/admin" className={btnS}>Refresh</a>
+          <a href={dl("registrations")} className={btnS}>Registrations CSV</a>
+          <a href={dl("attendance", "inaugural")} className={btnS}>Inaugural attendance CSV</a>
+          <a href={dl("attendance", "film")} className={btnS}>Filmmaking attendees CSV</a>
+          <a href={dl("shortlist")} className={btnP}>Shortlist CSV</a>
+        </>} />
+      <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
+        {stats.map(([l, n]) => (
+          <Card key={l} className="!gap-1"><span className="font-display text-5xl font-extrabold leading-none tracking-[-.02em] text-rust">{n}</span><span className="text-[15px] font-semibold text-fg-2">{l}</span></Card>
         ))}
       </div>
-      <section>
-        <h2 className="mb-3 font-display text-2xl font-extrabold">Attendance per session</h2>
-        <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
-          {(sessions ?? []).map((x) => (
-            <div key={x.key} className={card + " flex items-center justify-between gap-3"}>
-              <div><div className="font-semibold">{x.label}</div><a className="text-sm !text-rust" href={`/admin/export?type=attendance&session=${x.key}`}>Download CSV</a></div>
-              <div className="font-display text-3xl font-extrabold">{count(x.key)}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-      <section>
-        <h2 className="mb-3 font-display text-2xl font-extrabold">Outside seats used</h2>
-        <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
-          {WORKSHOP_OPTIONS.map((w) => (
-            <div key={w.key} className={card}><div className="font-semibold">{w.name}</div><div className="font-display text-3xl font-extrabold">{taken[w.key] ?? 0} / {s.seat_cap}</div></div>
-          ))}
-        </div>
-      </section>
-      <section className="flex flex-wrap gap-3">
-        {[["registrations", "All registrations"], ["leaderboard", "Leaderboard"], ["shortlist", "Photo walk shortlist"]].map(([t, l]) => (
-          <a key={t} href={`/admin/export?type=${t}`} className="btn btn-rust px-5 py-2.5 text-sm">{l} CSV</a>
-        ))}
-        <a href="/admin/export?type=attendance&session=film" className="btn btn-rust px-5 py-2.5 text-sm">Filmmaking attendees CSV</a>
-      </section>
-    </div>
+      <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(340px,1fr))]">
+        <Card className="!gap-4 !p-[22px]">
+          <span className={monoHead}>Attendance per session</span>
+          {bars.map(([l, k, d]) => <Bar key={k} label={l} count={`${cnt(k)} / ${d}`} pct={d ? (cnt(k) / d) * 100 : 0} />)}
+          <Bar label="Photo walk (all checkpoints)" count={`${boarded} boarded`} pct={(boarded / Math.max(1, walkSel * Math.max(1, cps?.length ?? 0))) * 100} />
+          <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-fg/15 pt-3 text-sm">
+            {[...bars.map(([l, k]) => [l, k] as const), ["Photo walk", "walk"] as const].map(([l, k]) => <a key={k} href={dl("attendance", k)}>{l} CSV</a>)}
+          </div>
+        </Card>
+        <Card className="!gap-4 !self-start !p-[22px]">
+          <span className={monoHead}>Outside seats used per workshop</span>
+          {WORKSHOP_OPTIONS.map((w) => {
+            const t = taken[w.key] ?? 0;
+            return <Bar key={w.key} label={w.name} count={`${t} / ${s.seat_cap}`} pct={s.seat_cap ? (t / s.seat_cap) * 100 : 0} color={t >= s.seat_cap ? "#A4210F" : "#A82E17"} />;
+          })}
+          <span className="border-t border-fg/15 pt-3 text-sm text-fg-3">
+            {last ? `Last scan at ${new Date(last).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" })}. Refresh to see the latest numbers.` : "No scans yet."}
+          </span>
+        </Card>
+      </div>
+    </>
   );
 }

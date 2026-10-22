@@ -1,67 +1,83 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
+import { moveRow, nextPosition } from "@/lib/reorder";
+import { AForm } from "@/components/admin/Toast";
+import { Card, CardGrid, CardHead, Field, FieldGrid, PageTitle, btnD, btnP, btnS, input, monoHead } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 
-async function save(form: FormData) {
+type Row = { id: string; kind: "online" | "campus"; genre: string; title: string; description: string; prize: string; theme: string; deadline: string; url: string; live: boolean };
+
+async function act(form: FormData) {
   "use server";
   await requireAdmin("super");
-  const id = String(form.get("id") ?? "");
-  const row = {
-    kind: String(form.get("kind")), genre: String(form.get("genre")), title: String(form.get("title")),
-    description: String(form.get("description")), prize: String(form.get("prize")), theme: String(form.get("theme")),
-    deadline: String(form.get("deadline")), url: String(form.get("url")), live: form.get("live") === "on",
-    position: Number(form.get("position") || 0),
-  };
-  const { error } = id ? await db().from("competitions").update(row).eq("id", id) : await db().from("competitions").insert(row);
-  if (error) throw new Error(error.message);
-  revalidatePath("/competitions");
-  revalidatePath("/admin/competitions");
-}
-async function remove(form: FormData) {
-  "use server";
-  await requireAdmin("super");
-  await db().from("competitions").delete().eq("id", String(form.get("id")));
+  const op = String(form.get("op")), id = String(form.get("id") ?? ""), g = (k: string) => String(form.get(k) ?? "").trim();
+  const sb = db();
+  if (op === "add") {
+    const kind = g("kind");
+    const { error } = await sb.from("competitions").insert({
+      kind, title: kind === "campus" ? "New in-campus competition" : "New competition", genre: "Genre", position: await nextPosition("competitions", { kind }),
+    });
+    if (error) throw new Error(error.message);
+  } else if (op === "delete") {
+    await sb.from("competitions").delete().eq("id", id);
+  } else if (op === "up" || op === "down") {
+    await moveRow("competitions", id, op === "up" ? -1 : 1, { kind: g("kind") });
+  } else {
+    const live = op === "toggle" ? g("live") !== "true" : g("live") === "true";
+    const { error } = await sb.from("competitions").update({
+      title: g("title"), genre: g("genre"), prize: g("prize"), theme: g("theme"), deadline: g("deadline"), url: g("url"), description: g("description"), live,
+    }).eq("id", id);
+    if (error) throw new Error(error.message);
+  }
   revalidatePath("/competitions");
   revalidatePath("/admin/competitions");
 }
 
-const inp = "w-full rounded border border-fg/30 bg-white px-2 py-1.5 text-sm";
+const MSG = { save: "Saved", toggle: "Updated", add: "Competition added", delete: "Deleted", up: "Moved up", down: "Moved down" };
 
-function Form({ c }: { c?: Record<string, string | number | boolean> }) {
-  const d = (k: string) => (c?.[k] as string) ?? "";
+function Comp({ c, linkLabel }: { c: Row; linkLabel: string }) {
   return (
-    <form action={save} className="grid gap-2 rounded-xl border border-fg/10 bg-cream-2 p-4 [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">
-      {c && <input type="hidden" name="id" value={d("id")} />}
-      <select name="kind" defaultValue={d("kind") || "online"} className={inp}><option value="online">Online (Unstop)</option><option value="campus">In-campus (Google Form)</option></select>
-      <input name="genre" defaultValue={d("genre")} placeholder="Genre" required className={inp} />
-      <input name="title" defaultValue={d("title")} placeholder="Title" required className={inp} />
-      <input name="prize" defaultValue={d("prize")} placeholder="Prize" className={inp} />
-      <input name="theme" defaultValue={d("theme")} placeholder="Theme" className={inp} />
-      <input name="deadline" defaultValue={d("deadline")} placeholder="Deadline" className={inp} />
-      <input name="url" defaultValue={d("url")} placeholder="Unstop / Google Form URL" className={inp} />
-      <input name="position" type="number" defaultValue={c?.position as number ?? 0} placeholder="Order" className={inp} />
-      <textarea name="description" defaultValue={d("description")} placeholder="Description" className={inp + " col-span-full"} />
-      <label className="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" name="live" defaultChecked={!!c?.live} /> Live (show link)</label>
-      <div className="col-span-full flex gap-2">
-        <button className="btn btn-rust px-4 py-2 text-sm">{c ? "Save" : "Add competition"}</button>
-        {c && <button formAction={remove} className="btn border border-err bg-transparent px-4 py-2 text-sm text-err">Delete</button>}
-      </div>
-    </form>
+    <Card>
+      <AForm action={act} messages={MSG} confirm={{ delete: "Delete this competition?" }} className="flex flex-col gap-4">
+        <input type="hidden" name="id" value={c.id} /><input type="hidden" name="kind" value={c.kind} /><input type="hidden" name="live" value={String(c.live)} />
+        <CardHead title={c.title || "Untitled"} sub={c.genre}
+          right={<button name="op" value="toggle" className={`cursor-pointer whitespace-nowrap rounded-full border-[1.5px] px-3.5 py-1.5 text-[13px] font-bold ${c.live ? "border-ok bg-ok text-white" : "border-fg/40 bg-transparent text-fg"}`}>{c.live ? "Live" : "Coming soon"}</button>} />
+        <FieldGrid>
+          <Field label="Title" wide><input name="title" defaultValue={c.title} className={input} /></Field>
+          <Field label="Genre"><input name="genre" defaultValue={c.genre} className={input} /></Field>
+          <Field label="Prize"><input name="prize" defaultValue={c.prize} className={input} /></Field>
+          <Field label="Theme"><input name="theme" defaultValue={c.theme} placeholder="Announced 26 Oct" className={input} /></Field>
+          <Field label="Deadline"><input name="deadline" defaultValue={c.deadline} placeholder="Announced 26 Oct" className={input} /></Field>
+          <Field label={linkLabel} wide><input name="url" defaultValue={c.url} placeholder="https://" className={input} /></Field>
+          <Field label="Description" wide><textarea name="description" rows={4} defaultValue={c.description} className={`${input} resize-y leading-normal`} /></Field>
+        </FieldGrid>
+        <div className="flex flex-wrap gap-2">
+          <button name="op" value="save" className={btnP}>Save</button>
+          <button name="op" value="up" className={btnS}>↑ Up</button>
+          <button name="op" value="down" className={btnS}>↓ Down</button>
+          <button name="op" value="delete" className={btnD}>Delete</button>
+        </div>
+      </AForm>
+    </Card>
   );
 }
 
 export default async function Page() {
-  await requireAdmin("super");
-  const { data } = await db().from("competitions").select("*").order("kind").order("position");
+  const { data } = await db().from("competitions").select("*").order("position").order("id");
+  const rows = (data ?? []) as Row[];
+  const onl = rows.filter((r) => r.kind === "online"), cam = rows.filter((r) => r.kind === "campus");
+  const add = (kind: string, label: string, primary = false) => (
+    <AForm action={act} messages={MSG}><input type="hidden" name="kind" value={kind} /><button name="op" value="add" className={primary ? btnP : btnS}>{label}</button></AForm>
+  );
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="m-0 font-display text-3xl font-extrabold">Competitions</h1>
-      <p className="m-0 text-sm text-fg-3">When this list is empty the public page shows the placeholder competitions. Turn &quot;Live&quot; on per competition on 26 Oct.</p>
-      {(data ?? []).map((c) => <Form key={c.id} c={c} />)}
-      <h2 className="m-0 mt-4 font-display text-xl font-extrabold">Add new</h2>
-      <Form />
-    </div>
+    <>
+      <PageTitle title="Competitions" sub="Add, edit, reorder and delete. Switch each one between Live and Coming soon."
+        actions={<>{add("online", "Add Unstop competition")}{add("campus", "Add in-campus competition")}</>} />
+      {rows.length === 0 && <p className="m-0 text-fg-3">Nothing here yet, so the public page shows placeholder competitions. Adding the first one replaces them all.</p>}
+      <div className="flex flex-col gap-3.5"><div className={monoHead}>Online · Unstop</div><CardGrid>{onl.map((c) => <Comp key={c.id} c={c} linkLabel="Unstop URL" />)}</CardGrid></div>
+      <div className="flex flex-col gap-3.5"><div className={monoHead}>In-campus · Google Forms</div><CardGrid>{cam.map((c) => <Comp key={c.id} c={c} linkLabel="Google Form URL" />)}</CardGrid></div>
+    </>
   );
 }

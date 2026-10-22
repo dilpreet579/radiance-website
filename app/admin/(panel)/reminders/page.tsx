@@ -1,74 +1,94 @@
+import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
-import { sendDay, sendTest } from "@/lib/reminders";
+import { bodyWithNotes, recipientsFor, sendDay, sendTest, type Template } from "@/lib/reminders";
+import { fillTemplate } from "@/lib/email";
+import { AForm } from "@/components/admin/Toast";
+import { Badge, Card, CardGrid, CardHead, Field, FieldGrid, PageTitle, btnP, btnS, input } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 
-async function save(form: FormData) {
-  "use server";
-  await requireAdmin("super");
-  await db().from("reminder_templates").update({
-    subject: String(form.get("subject")), body: String(form.get("body")), event: String(form.get("event")), venue: String(form.get("venue")),
-  }).eq("day", String(form.get("day")));
-  revalidatePath("/admin/reminders");
-}
-async function sendNow(form: FormData) {
-  "use server";
-  await requireAdmin("super");
-  await sendDay(String(form.get("day")));
-  revalidatePath("/admin/reminders");
-}
-async function test(form: FormData) {
+const LABEL: Record<string, string> = { "2026-10-26": "26 Oct · Inaugural", "2026-10-27": "27 Oct · Photography", "2026-10-28": "28 Oct · Filmmaking", "2026-10-29": "29 Oct · Motion Design", "2026-10-30": "30 Oct · Graphic Design", "2026-10-31": "31 Oct · Photo Walk" };
+const WHO: Record<Template["audience"], string> = { nit: "all NIT Delhi registrants", nit_and_workshop: "all NIT Delhi registrants plus outside students who selected this workshop", walk_selected: "students selected for the photo walk" };
+
+async function act(form: FormData) {
   "use server";
   const a = await requireAdmin("super");
-  const to = String(form.get("to") || a.email);
-  try { await sendTest(String(form.get("day")), to); } catch (e) { console.error("test reminder", e); }
+  const op = String(form.get("op")), day = String(form.get("day")), g = (k: string) => String(form.get(k) ?? "");
+  if (op === "test") {
+    await sendTest(day, a.email); // saved text is what's sent, so save first if you edited
+    revalidatePath("/admin/reminders");
+    return `Test email sent to ${a.email}`;
+  }
+  const { error } = await db().from("reminder_templates").update({ subject: g("subject"), venue: g("venue"), body: g("body"), notes: g("notes") }).eq("day", day);
+  if (error) throw new Error(error.message);
+  if (op === "send") {
+    const r = await sendDay(day);
+    revalidatePath("/admin/reminders");
+    return r.failed ? `Sent ${r.sent}, ${r.failed} failed (see log)` : `Sent to ${r.sent} recipients${r.skipped ? ` (${r.skipped} already had it)` : ""}`;
+  }
   revalidatePath("/admin/reminders");
 }
 
-const inp = "w-full rounded border border-fg/30 bg-white px-2 py-1.5 text-sm";
+export default async function Page({ searchParams }: { searchParams: Promise<{ day?: string }> }) {
+  const { day: want } = await searchParams;
+  const { data: tpls } = await db().from("reminder_templates").select("*").order("day");
+  const list = (tpls ?? []) as Template[];
+  const t = list.find((x) => x.day === want) ?? list[0];
+  if (!t) return <PageTitle title="Reminder emails" sub="No templates found. Re-run supabase/schema.sql." />;
 
-export default async function Page() {
-  await requireAdmin("super");
-  const [{ data: tpls }, { data: log }] = await Promise.all([
-    db().from("reminder_templates").select("*").order("day"),
-    db().from("reminder_log").select("day,email,ok,error,test,sent_at").order("sent_at", { ascending: false }).limit(60),
+  const [recips, { data: log }] = await Promise.all([
+    recipientsFor(t),
+    db().from("reminder_log").select("email,ok,error,test,sent_at").eq("day", t.day).order("sent_at", { ascending: false }).limit(40),
   ]);
+  const sample = { name: "Aarav Sharma", token: "RAD26-0001", venue: t.venue, event: t.event };
+  const preview = `Subject: ${fillTemplate(t.subject, sample)}\n\n${fillTemplate(bodyWithNotes(t), sample)}\n\nTitle Sponsor: Bharat Petroleum`;
+  const lines = (log ?? []).map((l) =>
+    `${new Date(l.sent_at).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" })} · ${l.test ? "Test" : l.ok ? "Sent" : "Failed"} · ${l.email}${l.ok ? "" : ` · ${l.error}`}`);
+
   return (
-    <div className="flex flex-col gap-5">
-      <h1 className="m-0 font-display text-3xl font-extrabold">Morning reminders (9:30 AM IST)</h1>
-      <p className="m-0 text-sm text-fg-3">Placeholders: {"{name} {token} {venue} {event}"}. Sent automatically by the daily cron; &quot;Send now&quot; skips anyone already emailed for that day.</p>
-      {(tpls ?? []).map((t) => (
-        <form key={t.day} action={save} className="grid gap-2 rounded-xl border border-fg/10 bg-cream-2 p-4">
-          <input type="hidden" name="day" value={t.day} />
-          <div className="font-display text-lg font-extrabold">{t.day} <span className="text-sm font-normal text-fg-3">· audience: {t.audience}{t.workshop_key ? ` + ${t.workshop_key} outside` : ""}</span></div>
-          <input name="event" defaultValue={t.event} placeholder="Event name + time" className={inp} />
-          <input name="venue" defaultValue={t.venue} placeholder="Exact venue inside campus" className={inp} />
-          <input name="subject" defaultValue={t.subject} className={inp} />
-          <textarea name="body" rows={5} defaultValue={t.body} className={inp} />
-          <div className="flex flex-wrap items-center gap-2">
-            <button className="btn btn-rust px-4 py-2 text-sm">Save</button>
-            <button formAction={sendNow} className="btn btn-gold px-4 py-2 text-sm">Send now</button>
-            <input name="to" type="email" placeholder="test to (default: you)" className={inp + " max-w-56"} />
-            <button formAction={test} className="btn border border-fg/40 bg-transparent px-4 py-2 text-sm">Send test</button>
-          </div>
-        </form>
-      ))}
-      <h2 className="m-0 font-display text-xl font-extrabold">Recent sends</h2>
-      <div className="overflow-x-auto rounded-xl border border-fg/10 bg-cream-2">
-        <table className="w-full text-sm">
-          <tbody>
-            {(log ?? []).map((l, i) => (
-              <tr key={i} className="border-t border-fg/10 first:border-0">
-                <td className="px-3 py-1.5">{l.day}</td><td className="px-3 py-1.5">{l.email}</td>
-                <td className={`px-3 py-1.5 font-semibold ${l.ok ? "text-green-700" : "text-err"}`}>{l.ok ? (l.test ? "test sent" : "sent") : `failed: ${l.error}`}</td>
-                <td className="px-3 py-1.5 text-fg-3">{new Date(l.sent_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <>
+      <PageTitle title="Reminder emails" sub="Sent automatically at 9:30 AM IST on each event day. Edit the template before it goes out." />
+      <div className="flex flex-wrap gap-2">
+        {list.map((x) => (
+          <Link key={x.day} href={`/admin/reminders?day=${x.day}`}
+            className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full border-[1.5px] px-4 text-[15px] font-semibold ${x.day === t.day ? "border-gold bg-gold !text-bg" : "border-fg/30 !text-fg"}`}>
+            {LABEL[x.day] ?? x.day}
+          </Link>
+        ))}
       </div>
-    </div>
+      <CardGrid>
+        <Card>
+          <AForm action={act} className="flex flex-col gap-4" confirm={{ send: `Send this reminder now to ${recips.length} recipients?` }}>
+            <input type="hidden" name="day" value={t.day} />
+            <CardHead title={`Template · ${LABEL[t.day] ?? t.day}`} sub={`Recipients: ${WHO[t.audience]} (${recips.length}).`} right={<Badge>9:30 AM IST</Badge>} />
+            <FieldGrid>
+              <Field label="Subject" wide><input name="subject" defaultValue={t.subject} className={input} /></Field>
+              <Field label="Venue inside campus" wide><input name="venue" defaultValue={t.venue} className={input} /></Field>
+              <Field label="Body" wide hint="Placeholders: {name} {token} {venue} {event}"><textarea name="body" rows={4} defaultValue={t.body} className={`${input} resize-y leading-normal`} /></Field>
+              <Field label="Extra notes" wide hint="Refreshments, SRHC bus info and similar."><textarea name="notes" rows={4} defaultValue={t.notes} className={`${input} resize-y leading-normal`} /></Field>
+            </FieldGrid>
+            <div className="flex flex-wrap gap-2">
+              <button name="op" value="save" className={btnS}>Save</button>
+              <button name="op" value="test" className={btnS}>Send test email</button>
+              <button name="op" value="send" className={btnP}>Send now</button>
+            </div>
+          </AForm>
+        </Card>
+        <div className="flex flex-col gap-3.5">
+          <Card>
+            <CardHead title="Preview" sub="Rendered with a sample student. Save to refresh." />
+            <div className="whitespace-pre-wrap rounded-lg border border-fg/20 bg-[#fff8ec] p-4 text-[15px] leading-[1.55]">{preview}</div>
+          </Card>
+          <Card>
+            <CardHead title="Send log" />
+            <div className="flex flex-col text-sm">
+              {(lines.length ? lines : ["Nothing sent yet."]).map((l, i) => <div key={i} className="break-words border-t border-fg/[.12] py-2 font-mono">{l}</div>)}
+            </div>
+          </Card>
+        </div>
+      </CardGrid>
+    </>
   );
 }

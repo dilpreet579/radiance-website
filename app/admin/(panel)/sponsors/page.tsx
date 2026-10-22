@@ -1,61 +1,81 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
+import { moveRow, nextPosition } from "@/lib/reorder";
+import { AForm } from "@/components/admin/Toast";
+import LogoDrop from "@/components/admin/LogoDrop";
+import { Badge, Card, CardGrid, CardHead, Field, FieldGrid, PageTitle, btnD, btnP, btnS, input } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 
-async function save(form: FormData) {
-  "use server";
-  await requireAdmin("super");
-  const id = String(form.get("id") ?? "");
-  const row = {
-    name: String(form.get("name")), tagline: String(form.get("tagline")), logo_url: String(form.get("logo_url")),
-    link: String(form.get("link")), tier: String(form.get("tier")), position: Number(form.get("position") || 0),
-  };
-  if (id) await db().from("sponsors").update(row).eq("id", id);
-  else await db().from("sponsors").insert(row);
-  revalidatePath("/", "layout");
-  revalidatePath("/admin/sponsors");
+const BUCKET = "sponsor-logos";
+
+async function uploadLogo(file: File): Promise<string> {
+  if (file.size > 4 * 1024 * 1024) throw new Error("Logo must be under 4 MB");
+  const sb = db();
+  await sb.storage.createBucket(BUCKET, { public: true }).catch(() => {}); // already exists is fine
+  const ext = (file.name.split(".").pop() ?? "png").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const path = `${Date.now()}.${ext}`;
+  const { error } = await sb.storage.from(BUCKET).upload(path, file, { contentType: file.type, upsert: true });
+  if (error) throw new Error("Upload failed: " + error.message);
+  return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
-async function remove(form: FormData) {
+
+async function act(form: FormData) {
   "use server";
   await requireAdmin("super");
-  await db().from("sponsors").delete().eq("id", String(form.get("id")));
+  const op = String(form.get("op")), id = String(form.get("id") ?? ""), g = (k: string) => String(form.get(k) ?? "").trim();
+  const sb = db();
+  if (op === "add") {
+    await sb.from("sponsors").insert({ name: "New sponsor", tier: "associate", position: await nextPosition("sponsors") });
+  } else if (op === "delete") {
+    await sb.from("sponsors").delete().eq("id", id);
+  } else if (op === "up" || op === "down") {
+    await moveRow("sponsors", id, op === "up" ? -1 : 1);
+  } else {
+    const row: Record<string, string> = { name: g("name"), tier: g("tier") === "title" ? "title" : "associate", tagline: g("tagline"), link: g("link") };
+    const file = form.get("logo");
+    if (file instanceof File && file.size > 0) row.logo_url = await uploadLogo(file);
+    const { error } = await sb.from("sponsors").update(row).eq("id", id);
+    if (error) throw new Error(error.message);
+  }
   revalidatePath("/", "layout");
   revalidatePath("/admin/sponsors");
 }
 
-const inp = "w-full rounded border border-fg/30 bg-white px-2 py-1.5 text-sm";
-
-function Form({ s }: { s?: Record<string, string | number> }) {
-  const d = (k: string) => (s?.[k] as string) ?? "";
-  return (
-    <form action={save} className="grid gap-2 rounded-xl border border-fg/10 bg-cream-2 p-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
-      {s && <input type="hidden" name="id" value={d("id")} />}
-      <input name="name" defaultValue={d("name")} placeholder="Name" required className={inp} />
-      <select name="tier" defaultValue={d("tier") || "associate"} className={inp}><option value="title">Title sponsor (ranks first)</option><option value="associate">Associate</option></select>
-      <input name="tagline" defaultValue={d("tagline")} placeholder="Tagline" className={inp} />
-      <input name="logo_url" defaultValue={d("logo_url")} placeholder="Logo URL (https://…)" className={inp} />
-      <input name="link" defaultValue={d("link")} placeholder="Website link" className={inp} />
-      <input name="position" type="number" defaultValue={s?.position as number ?? 0} placeholder="Order" className={inp} />
-      <div className="col-span-full flex gap-2">
-        <button className="btn btn-rust px-4 py-2 text-sm">{s ? "Save" : "Add sponsor"}</button>
-        {s && <button formAction={remove} className="btn border border-err bg-transparent px-4 py-2 text-sm text-err">Delete</button>}
-      </div>
-    </form>
-  );
-}
+const MSG = { save: "Saved", add: "Sponsor added", delete: "Removed", up: "Moved up", down: "Moved down" };
 
 export default async function Page() {
-  await requireAdmin("super");
-  const { data } = await db().from("sponsors").select("*").order("tier").order("position");
+  const { data } = await db().from("sponsors").select("*").order("tier").order("position").order("id");
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="m-0 font-display text-3xl font-extrabold">Sponsors</h1>
-      <p className="m-0 text-sm text-fg-3">Paste a hosted logo URL (e.g. upload to Supabase Storage as public and copy the link). The title sponsor shows in the header, footer and home page.</p>
-      {(data ?? []).map((s) => <Form key={s.id} s={s} />)}
-      <h2 className="m-0 mt-4 font-display text-xl font-extrabold">Add new</h2>
-      <Form />
-    </div>
+    <>
+      <PageTitle title="Sponsors" sub="The title sponsor appears in the header, footer, ticket and emails. It always ranks first."
+        actions={<AForm action={act} messages={MSG}><button name="op" value="add" className={btnP}>Add sponsor</button></AForm>} />
+      <CardGrid>
+        {(data ?? []).map((s) => (
+          <Card key={s.id}>
+            <AForm action={act} messages={MSG} confirm={{ delete: "Remove this sponsor?" }} className="flex flex-col gap-4">
+              <input type="hidden" name="id" value={s.id} />
+              <CardHead title={s.name || "Untitled"} right={s.tier === "title" ? <Badge>Title sponsor</Badge> : undefined} />
+              <LogoDrop current={s.logo_url} />
+              <FieldGrid>
+                <Field label="Name"><input name="name" defaultValue={s.name} className={input} /></Field>
+                <Field label="Tier">
+                  <select name="tier" defaultValue={s.tier} className={input}><option value="title">Title sponsor</option><option value="associate">Associate sponsor</option></select>
+                </Field>
+                <Field label="Tagline" wide><input name="tagline" defaultValue={s.tagline} className={input} /></Field>
+                <Field label="Website" wide><input name="link" defaultValue={s.link} placeholder="https://" className={input} /></Field>
+              </FieldGrid>
+              <div className="flex flex-wrap gap-2">
+                <button name="op" value="save" className={btnP}>Save</button>
+                <button name="op" value="up" className={btnS}>↑ Up</button>
+                <button name="op" value="down" className={btnS}>↓ Down</button>
+                <button name="op" value="delete" className={btnD}>Remove</button>
+              </div>
+            </AForm>
+          </Card>
+        ))}
+      </CardGrid>
+    </>
   );
 }

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#2E070B}
+*{box-sizing:border-box}
+a{color:#A82E17;text-decoration:none}
+a:hover{color:#2A0B0C}
+button,input,textarea{font-family:inherit}
+::selection{background:#EBB65B;color:#2E070B}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ rootBg }};color:{{ rootInk }};font-family:'Hanken Grotesk',sans-serif;font-size:16px;line-height:1.5">
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;background:url(assets/pattern.jpg) center/cover,#430B10;display:grid;place-items:center;padding:24px;color:#F4E9D9">
+  <div style="width:min(440px,100%);display:flex;flex-direction:column;gap:22px">
+    <div style="background:#F4E9D9;border-radius:6px;padding:10px 14px;box-shadow:8px 8px 0 #1E0407"><div style="aspect-ratio:2172/510;overflow:hidden"><img src="assets/radiance26-logo.png" alt="Radiance 2026" style="width:100%;display:block;margin-top:-3.2%"></div></div>
+    <div style="background:#F4E9D9;color:#2A0B0C;border-radius:10px;padding:clamp(22px,4vw,32px);display:flex;flex-direction:column;gap:18px">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;line-height:1">Admin sign in</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <sc-for list="{{ roleTabs }}" as="r" hint-placeholder-count="2">
+          <button onClick="{{ r.onClick }}" style="{{ r.style }}">{{ r.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <label style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6B3A33">Email</label>
+        <input value="{{ loginEmail }}" onChange="{{ onEmail }}" style="width:100%;padding:13px 14px;border:1.5px solid rgba(42,11,12,.3);border-radius:8px;background:#FBF5EA;font-size:16px;color:#2A0B0C;outline:none" style-focus="border-color:#A82E17">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <label style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6B3A33">Password</label>
+        <input type="password" value="demo-password" onChange="{{ noop }}" style="width:100%;padding:13px 14px;border:1.5px solid rgba(42,11,12,.3);border-radius:8px;background:#FBF5EA;font-size:16px;color:#2A0B0C;outline:none" style-focus="border-color:#A82E17">
+      </div>
+      <button onClick="{{ signIn }}" style="background:#A82E17;color:#F4E9D9;border:0;border-radius:999px;font-weight:700;font-size:17px;padding:15px 28px;cursor:pointer" style-hover="background:#2A0B0C">Sign in</button>
+      <div style="font-size:14px;color:#6B3A33">{{ loginNote }}</div>
+    </div>
+    <a href="Radiance%202026.dc.html" style="color:#EBB65B;font-weight:600;font-size:15px;text-align:center">← Back to the public site</a>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isScanner }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:#2E070B;color:#F4E9D9;border-left:1px solid rgba(244,233,217,.12);border-right:1px solid rgba(244,233,217,.12)">
+  <div style="padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid rgba(244,233,217,.14);background:#1E0407">
+    <div style="display:flex;flex-direction:column">
+      <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.1">Radiance Scanner</span>
+      <span style="font-size:13px;color:#D9C3B0">{{ loginEmail }}</span>
+    </div>
+    <button onClick="{{ signOut }}" style="min-height:44px;border:1.5px solid rgba(244,233,217,.45);background:transparent;color:#F4E9D9;border-radius:999px;padding:0 18px;font-weight:600;font-size:14px;cursor:pointer">Sign out</button>
+  </div>
+  <sc-if value="{{ hasRes }}" hint-placeholder-val="{{ false }}">
+    <div style="position:sticky;top:0;z-index:10;background:{{ res.bg }};color:{{ res.fg }};padding:16px 18px;display:flex;flex-direction:column;gap:2px;box-shadow:0 6px 20px rgba(0,0,0,.35)">
+      <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;line-height:1.05">{{ res.title }}</span>
+      <span style="font-size:19px;font-weight:700">{{ res.name }}</span>
+      <span style="font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.06em">{{ res.token }}</span>
+      <span style="font-size:15px">{{ res.detail }}</span>
+    </div>
+  </sc-if>
+  <div style="padding:18px;display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">Session</span>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ sessChips }}" as="c" hint-placeholder-count="7">
+          <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <sc-if value="{{ isWalk }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">Checkpoint · bus boarding</span>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ cpChips }}" as="c" hint-placeholder-count="4">
+            <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+    <div style="position:relative;aspect-ratio:4/3;max-height:240px;width:100%;border:1px solid rgba(244,233,217,.25);background:repeating-linear-gradient(135deg,rgba(244,233,217,.08) 0 14px,rgba(244,233,217,.02) 14px 28px);display:grid;place-items:center">
+      <span style="position:absolute;left:18px;top:18px;width:36px;height:36px;border-left:4px solid #EBB65B;border-top:4px solid #EBB65B"></span>
+      <span style="position:absolute;right:18px;top:18px;width:36px;height:36px;border-right:4px solid #EBB65B;border-top:4px solid #EBB65B"></span>
+      <span style="position:absolute;left:18px;bottom:18px;width:36px;height:36px;border-left:4px solid #EBB65B;border-bottom:4px solid #EBB65B"></span>
+      <span style="position:absolute;right:18px;bottom:18px;width:36px;height:36px;border-right:4px solid #EBB65B;border-bottom:4px solid #EBB65B"></span>
+      <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#D9C3B0;text-align:center;padding:0 40px">Camera preview<br>point at the ticket QR</span>
+    </div>
+    <form onSubmit="{{ submitScan }}" style="display:flex;flex-direction:column;gap:10px;margin:0">
+      <label style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B">Or type the token ID</label>
+      <div style="display:flex;gap:10px">
+        <input value="{{ scToken }}" onChange="{{ onToken }}" placeholder="RAD26-0007" style="flex:1;min-width:0;min-height:52px;padding:0 16px;border:1.5px solid rgba(244,233,217,.5);border-radius:10px;background:rgba(244,233,217,.08);font-family:'DM Mono',monospace;font-size:18px;color:#F4E9D9;outline:none;text-transform:uppercase" style-focus="border-color:#EBB65B">
+        <button type="submit" style="min-height:52px;background:#EBB65B;color:#2E070B;border:0;border-radius:10px;padding:0 22px;font-weight:700;font-size:16px;cursor:pointer">Mark</button>
+      </div>
+    </form>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#D9C3B0">Demo scans (no camera in the prototype)</span>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ simBtns }}" as="b" hint-placeholder-count="3">
+          <button onClick="{{ b.onClick }}" style="min-height:44px;border:1.5px dashed rgba(244,233,217,.5);background:transparent;color:#F4E9D9;border-radius:999px;padding:0 16px;font-weight:600;font-size:14px;cursor:pointer" style-hover="background:rgba(244,233,217,.1)">{{ b.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <sc-if value="{{ hasLog }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column">
+        <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EBB65B;margin-bottom:6px">Recent scans</span>
+        <sc-for list="{{ scanLog }}" as="l" hint-placeholder-count="0">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid rgba(244,233,217,.14)">
+            <span style="flex:0 0 12px;height:12px;border-radius:50%;background:{{ l.color }}"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-weight:700;overflow-wrap:anywhere">{{ l.name }}</span><span style="font-size:13px;color:#D9C3B0">{{ l.token }} · {{ l.ses }}</span></span>
+            <span style="font-family:'DM Mono',monospace;font-size:13px;color:#D9C3B0;white-space:nowrap">{{ l.time }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSuper }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;min-height:100vh">
+  <div style="background:#2E070B;color:#F4E9D9;padding:0 clamp(16px,3vw,28px);height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:20">
+    <div style="display:flex;align-items:center;gap:12px">
+      
+      <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;white-space:nowrap">Radiance <span style="color:#EBB65B">Admin</span></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:18px;font-size:14px">
+      <a href="Radiance%202026.dc.html" style="color:#EBB65B;font-weight:600;white-space:nowrap">Public site ↗</a>
+      <button onClick="{{ signOut }}" style="border:1.5px solid rgba(244,233,217,.45);background:transparent;color:#F4E9D9;border-radius:999px;padding:7px 16px;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap">Sign out</button>
+    </div>
+  </div>
+  <div style="display:flex;flex:1;min-height:0">
+    <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+      <aside style="flex:0 0 220px;background:#430B10;padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:60px;height:calc(100vh - 60px);align-self:flex-start">
+        <sc-for list="{{ adminNav }}" as="n" hint-placeholder-count="8">
+          <button onClick="{{ n.onClick }}" style="{{ n.style }}">{{ n.label }}</button>
+        </sc-for>
+      </aside>
+    </sc-if>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:8px;overflow-x:auto;padding:12px clamp(16px,3vw,28px);background:#430B10">
+          <sc-for list="{{ adminNav }}" as="n" hint-placeholder-count="8">
+            <button onClick="{{ n.onClick }}" style="{{ n.chipStyle }}">{{ n.label }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <main style="padding:clamp(20px,3vw,40px) clamp(16px,3vw,40px) 80px;display:flex;flex-direction:column;gap:24px;max-width:1400px;width:100%">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:6px;max-width:680px">
+            <h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(30px,4vw,44px);line-height:1;letter-spacing:-.02em">{{ vTitle }}</h1>
+            <span style="color:#6B3A33;font-size:16px">{{ vSub }}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ topActions }}" as="a" hint-placeholder-count="0">
+              <button onClick="{{ a.onClick }}" style="{{ a.style }}">{{ a.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:24px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+              <sc-for list="{{ ovStats }}" as="s" hint-placeholder-count="4">
+                <div style="background:#FBF5EA;border:1px solid rgba(42,11,12,.18);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:48px;line-height:1;color:#A82E17;letter-spacing:-.02em">{{ s.n }}</span>
+                  <span style="font-size:15px;color:#4A1E1A;font-weight:600">{{ s.l }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px">
+              <div style="background:#FBF5EA;border:1px solid rgba(42,11,12,.18);border-radius:10px;padding:22px;display:flex;flex-direction:column;gap:16px">
+                <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#6B3A33">Attendance per session</span>
+                <sc-for list="{{ sesBars }}" as="b" hint-placeholder-count="7">
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <div style="display:flex;justify-content:space-between;gap:12px;font-size:15px"><span style="font-weight:600">{{ b.label }}</span><span style="font-family:'DM Mono',monospace;color:#4A1E1A">{{ b.count }}</span></div>
+                    <div style="height:10px;border-radius:99px;background:rgba(42,11,12,.12);overflow:hidden"><div style="height:100%;width:{{ b.pct }};background:#A82E17;border-radius:99px"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:#FBF5EA;border:1px solid rgba(42,11,12,.18);border-radius:10px;padding:22px;display:flex;flex-direction:column;gap:16px;align-self:start">
+                <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#6B3A33">Outside seats used per workshop</span>
+                <sc-for list="{{ seatBars }}" as="b" hint-placeholder-count="4">
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <div style="display:flex;justify-content:space-between;gap:12px;font-size:15px"><span style="font-weight:600">{{ b.label }}</span><span style="font-family:'DM Mono',monospace;color:#4A1E1A">{{ b.count }}</span></div>
+                    <div style="height:10px;border-radius:99px;background:rgba(42,11,12,.12);overflow:hidden"><div style="height:100%;width:{{ b.pct }};background:{{ b.color }};border-radius:99px"></div></div>
+                  </div>
+                </sc-for>
+                <span style="font-size:14px;color:#6B3A33;border-top:1px solid rgba(42,11,12,.15);padding-top:12px">{{ lastScan }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isTable }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+              <input value="{{ tq }}" onChange="{{ onTq }}" placeholder="Search name, roll or token" style="flex:0 1 280px;min-width:0;padding:11px 14px;border:1.5px solid rgba(42,11,12,.3);border-radius:8px;background:#FBF5EA;font-size:15px;color:#2A0B0C;outline:none" style-focus="border-color:#A82E17">
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <sc-for list="{{ tFilters }}" as="f" hint-placeholder-count="3">
+                  <button onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</button>
+                </sc-for>
+              </div>
+              <span style="margin-left:auto;font-weight:700;color:{{ tSumColor }}">{{ tSummary }}</span>
+            </div>
+            <div style="background:#FBF5EA;border:1px solid rgba(42,11,12,.18);border-radius:10px;overflow-x:auto">
+              <div style="min-width:{{ tMin }}">
+                <div style="display:grid;grid-template-columns:{{ cols }};gap:12px;padding:12px 16px;background:#EBDCC6;border-bottom:1px solid rgba(42,11,12,.18);align-items:center">
+                  <sc-for list="{{ tHead }}" as="h" hint-placeholder-count="8">
+                    <button onClick="{{ h.onClick }}" style="{{ h.style }}">{{ h.label }}{{ h.arrow }}</button>
+                  </sc-for>
+                </div>
+                <sc-for list="{{ tRows }}" as="r" hint-placeholder-count="6">
+                  <div style="display:grid;grid-template-columns:{{ cols }};gap:12px;padding:9px 16px;align-items:center;border-bottom:1px solid rgba(42,11,12,.1);font-size:15px">
+                    <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="8">
+                      <sc-if value="{{ c.isText }}" hint-placeholder-val="{{ true }}"><span style="{{ c.style }}">{{ c.t }}</span></sc-if>
+                      <sc-if value="{{ c.isPill }}" hint-placeholder-val="{{ false }}"><span style="{{ c.style }}">{{ c.t }}</span></sc-if>
+                      <sc-if value="{{ c.isTick }}" hint-placeholder-val="{{ false }}"><span style="{{ c.style }}">{{ c.mark }}</span></sc-if>
+                      <sc-if value="{{ c.isInput }}" hint-placeholder-val="{{ false }}"><input type="{{ c.type }}" value="{{ c.v }}" onChange="{{ c.onChange }}" placeholder="{{ c.ph }}" style="width:100%;min-width:0;padding:7px 9px;border:1.5px solid rgba(42,11,12,.25);border-radius:6px;background:#fff8ec;font-size:14px;color:#2A0B0C;outline:none" style-focus="border-color:#A82E17"></sc-if>
+                      <sc-if value="{{ c.isToggle }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.t }}</button></sc-if>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isEditor }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:28px">
+            <sc-if value="{{ hasTabs }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="0">
+                  <button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-for list="{{ groups }}" as="g" hint-placeholder-count="1">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <sc-if value="{{ g.hasHeading }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#6B3A33">{{ g.heading }}</div>
+                </sc-if>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:14px;align-items:start">
+                  <sc-for list="{{ g.cards }}" as="c" hint-placeholder-count="2">
+                    <div style="background:#FBF5EA;border:1px solid rgba(42,11,12,.18);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0">
+                      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+                        <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                          <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;line-height:1.1;overflow-wrap:anywhere">{{ c.title }}</span>
+                          <sc-if value="{{ c.hasSub }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:#6B3A33">{{ c.sub }}</span></sc-if>
+                        </div>
+                        <sc-if value="{{ c.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:#430B10;color:#F4E9D9;border-radius:999px;padding:4px 12px;white-space:nowrap">{{ c.badge }}</span></sc-if>
+                        <sc-if value="{{ c.hasToggle }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.toggleClick }}" style="{{ c.toggleStyle }}">{{ c.toggleLabel }}</button></sc-if>
+                      </div>
+                      <sc-if value="{{ c.hasLogo }}" hint-placeholder-val="{{ false }}">
+                        <div style="height:84px;border:1.5px dashed rgba(168,46,23,.55);background:repeating-linear-gradient(135deg,rgba(168,46,23,.1) 0 10px,rgba(168,46,23,.03) 10px 20px);display:grid;place-items:center;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8A2210">Logo · drop file here</div>
+                      </sc-if>
+                      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
+                        <sc-for list="{{ c.fields }}" as="f" hint-placeholder-count="3">
+                          <div style="grid-column:{{ f.span }};display:flex;flex-direction:column;gap:6px;min-width:0">
+                            <label style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6B3A33">{{ f.label }}</label>
+                            <sc-if value="{{ f.isInput }}" hint-placeholder-val="{{ true }}"><input type="{{ f.type }}" value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.ph }}" style="width:100%;padding:10px 12px;border:1.5px solid rgba(42,11,12,.28);border-radius:8px;background:#fff8ec;font-size:15px;color:#2A0B0C;outline:none" style-focus="border-color:#A82E17"></sc-if>
+                            <sc-if value="{{ f.isArea }}" hint-placeholder-val="{{ false }}"><textarea rows="4" value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.ph }}" style="width:100%;padding:10px 12px;border:1.5px solid rgba(42,11,12,.28);border-radius:8px;background:#fff8ec;font-size:15px;line-height:1.5;color:#2A0B0C;outline:none;resize:vertical" style-focus="border-color:#A82E17"></textarea></sc-if>
+                            <sc-if value="{{ f.hasHint }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#6B3A33">{{ f.hint }}</span></sc-if>
+                          </div>
+                        </sc-for>
+                      </div>
+                      <sc-if value="{{ c.hasPreview }}" hint-placeholder-val="{{ false }}">
+                        <div style="white-space:pre-wrap;border:1px solid rgba(42,11,12,.2);border-radius:8px;background:#fff8ec;padding:16px;font-size:15px;line-height:1.55">{{ c.preview }}</div>
+                      </sc-if>
+                      <sc-if value="{{ c.hasLines }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;flex-direction:column;font-size:14px">
+                          <sc-for list="{{ c.lines }}" as="l" hint-placeholder-count="0"><div style="padding:8px 0;border-top:1px solid rgba(42,11,12,.12);font-family:'DM Mono',monospace">{{ l }}</div></sc-for>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ c.hasActions }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;flex-wrap:wrap;gap:8px">
+                          <sc-for list="{{ c.actions }}" as="a" hint-placeholder-count="2">
+                            <button onClick="{{ a.onClick }}" style="{{ a.style }}">{{ a.label }}</button>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </main>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2A0B0C;color:#F4E9D9;border-radius:999px;padding:12px 22px;font-weight:600;font-size:15px;box-shadow:0 8px 30px rgba(0,0,0,.35);z-index:100;max-width:calc(100vw - 32px)">{{ toast }}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = this.seed();
+
+  seed(){
+    const FN=['Aarav','Vihaan','Ananya','Ishita','Rohan','Kavya','Arjun','Meera','Kabir','Diya','Aditya','Saanvi','Yash','Riya','Dev','Tanvi','Harsh','Nisha','Karan','Pooja'];
+    const LN=['Sharma','Verma','Gupta','Singh','Mehta','Kapoor','Yadav','Joshi','Nair','Bansal','Chauhan','Malik'];
+    const BR=['CSE','ECE','EEE','ME','CE','ENC'],YR=['1st','2nd','3rd','4th'],OUT=['Delhi University','DTU','IP University','Jamia Millia Islamia','Amity University'];
+    const GE=['Male','Female'],DA=['18 Oct','19 Oct','20 Oct','21 Oct','22 Oct'];
+    const r=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x);};
+    const SES=['inaug','photo','film','motion','graphic'],WK=['photo','film','motion','graphic'];
+    const regs=[],att={exhibition:{}},eng={},rem={},sel={};
+    SES.forEach(k=>att[k]={});
+    for(let i=0;i<60;i++){
+      const out=i%5===4,token='RAD26-'+String(i+1).padStart(4,'0'),name=FN[(i*7)%20]+' '+LN[(i*5+3)%12],yr=Math.floor(r(i+1)*4);
+      let ws=out?WK.filter((k,j)=>r(i*4+j+9)>.45):[]; if(out&&!ws.length) ws=['photo'];
+      regs.push({token,name,gender:GE[i%2],type:out?'workshop':'universal',inst:out?OUT[i%5]:'NIT Delhi',
+        roll:out?String(2300000+i*37):'2'+(25-yr)+'121'+String(1000+i*13).slice(-4),year:YR[yr],branch:BR[(i*3+1)%6],
+        phone:'98'+String(10000000+Math.floor(r(i+50)*89999999)),email:name.toLowerCase().replace(' ','.')+(out?'@gmail.com':'@nitdelhi.ac.in'),at:DA[i%5],ws});
+      const tm=j=>(5+(j%2))+':'+String(30+Math.floor(r(i*3+j)*25))+' PM';
+      if(!out){ SES.slice(0,4).forEach((k,j)=>{ if(r(i*5+j+100)<[.85,.75,.7,.6][j]) att[k][token]={t:tm(j),by:'scanner1'}; }); eng[token]=Math.floor(r(i+200)*8)+2; }
+      else ws.filter(k=>k!=='graphic').forEach((k,j)=>{ if(r(i*5+j+300)<.7) att[k][token]={t:tm(j),by:'scanner2'}; });
+      rem[token]='';
+    }
+    regs.filter(x=>x.type==='universal').forEach(x=>{ if(SES.filter(k=>att[k][x.token]).length>=4) sel[x.token]=true; });
+    const days=[['26','26 Oct · Inaugural','Inaugural Ceremony','5:30–7:30 PM'],['27','27 Oct · Photography','Photography Workshop','5:30–7:30 PM'],['28','28 Oct · Filmmaking','Cinematic Filmmaking Workshop','3:30–6:30 PM'],['29','29 Oct · Motion Design','Motion Design Workshop','5:30–7:30 PM'],['30','30 Oct · Graphic Design','Graphic Design Workshop','5:30–7:30 PM'],['31','31 Oct · Photo Walk','Delhi Photo Walk','Entire day']];
+    const tpl={};
+    days.forEach(([k,,ev,tm])=>{ tpl[k]={subject:'Today: '+ev+' at Radiance 2026',venue:'To be announced',
+      body:'Hi {name},\n\n{event} is today ('+tm+') at {venue}. Please bring your ticket: show the QR or your token ID {token} at the entrance.',
+      notes:k==='31'?'':(k==='26'?'Refreshments will be provided. ':'Refreshments will be provided. ')+'NIT Delhi students at the SRHC campus: a separate bus leaves at 7:45 PM.'}; });
+    return { role:null,loginRole:'super',loginEmail:'admin@radiance.example',view:'overview',w:1200,toast:'',
+      regs,att,eng,rem,sel,tq:'',tf:'all',lb:{key:'att',dir:-1},
+      scan:{session:'inaug',cp:1,token:'',result:null,log:[]},lastScan:'No scans yet in this session.',
+      onl:[{id:1,title:'Theme-Based Photography Competition',genre:'Photography',prize:'₹8,000',theme:'',deadline:'',link:'',desc:'A national-level photography competition for students from colleges across India.',live:false},
+           {id:2,title:'Film Making Competition',genre:'Filmmaking',prize:'₹10,000',theme:'',deadline:'',link:'',desc:'A short film competition open to filmmakers and film clubs across India.',live:false},
+           {id:3,title:'Poster Design Competition',genre:'Graphic design',prize:'₹4,000',theme:'',deadline:'',link:'',desc:'A poster design competition for student designers.',live:false}],
+      cam:[{id:4,title:'In-Campus Photography Contest',genre:'Photography',prize:'₹3,000',theme:'',deadline:'',link:'',desc:'Open to NIT Delhi students.',live:false},
+           {id:5,title:'In-Campus Short Video Contest',genre:'Short video',prize:'₹3,000',theme:'',deadline:'',link:'',desc:'Open to NIT Delhi students.',live:false}],
+      cps:[{id:1,name:'Location 1'},{id:2,name:'Location 2'},{id:3,name:'Location 3'},{id:4,name:'Location 4'}],nextId:10,
+      sponsors:[{id:1,name:'Bharat Petroleum',tier:'Title Sponsor',tagline:'Radiance 2026 is proudly presented by Bharat Petroleum',link:'https://www.bharatpetroleum.in'}],
+      settings:{cap:'15',bus:'NIT Delhi students based at the SRHC campus get a separate bus at 7:45 PM on 26, 27, 28, 29 and 30 Oct.',refresh:'Provided to attendees of the inaugural ceremony and all four workshops.',venue:'To be announced',
+        cComedy:'I understand the show may contain mature or edgy humour and accept the audience conduct rules: no recording, no heckling, respectful behaviour.',
+        cWalk:'I accept responsibility for my personal safety, will follow bus and group discipline and the organizers\' instructions, will not leave the group, and understand the institute is not liable for personal belongings.',
+        cNorms:'I agree to follow NIT Delhi\'s institute rules and code of conduct while on campus.'},
+      days,tpl,day:'26',rlog:[] };
+  }
+
+  componentDidMount(){ this.onResize=()=>this.setState({w:window.innerWidth}); window.addEventListener('resize',this.onResize); this.onResize(); }
+  componentWillUnmount(){ window.removeEventListener('resize',this.onResize); clearTimeout(this._tt); }
+  toast=m=>{ this.setState({toast:m}); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}),2400); };
+  csv=(name,rows)=>{ const e=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"'; const b=new Blob([rows.map(r=>r.map(e).join(',')).join('\n')],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); a.remove(); this.toast('Exported '+name); };
+  setView=v=>this.setState({view:v,tq:'',tf:'all'});
+  setIn=(key,id,patch)=>this.setState(s=>({[key]:s[key].map(x=>x.id===id?{...x,...patch}:x)}));
+  fld=(key,id,k)=>e=>{ const v=e.target.value; this.setIn(key,id,{[k]:v}); };
+  move=(key,id,d)=>this.setState(s=>{ const a=[...s[key]],i=a.findIndex(x=>x.id===id),j=i+d; if(j<0||j>=a.length) return null; [a[i],a[j]]=[a[j],a[i]]; return {[key]:a}; });
+  del=(key,id)=>this.setState(s=>({[key]:s[key].filter(x=>x.id!==id)}));
+  add=(key,obj)=>this.setState(s=>({[key]:[...s[key],{...obj,id:s.nextId}],nextId:s.nextId+1}));
+  setS=k=>e=>{ const v=e.target.value; this.setState(s=>({settings:{...s.settings,[k]:v}})); };
+
+  sessKey(sc){ return sc.session==='walk'?'walk:'+sc.cp:sc.session; }
+  eligible(r,ses){
+    if(ses==='inaug') return r.type==='universal'?'':'Outside students cannot attend the inaugural ceremony.';
+    if(['photo','film','motion','graphic'].includes(ses)) return r.type==='universal'||r.ws.includes(ses)?'':'This student did not register for this workshop.';
+    if(ses==='walk') return r.type==='universal'&&this.state.sel[r.token]?'':'Not selected for the photo walk.';
+    return '';
+  }
+  doScan=raw=>{
+    const s=this.state,sc=s.scan,m=String(raw).trim().toUpperCase().match(/(\d+)\s*$/),token=m?'RAD26-'+String(+m[1]).padStart(4,'0'):'';
+    const r=s.regs.find(x=>x.token===token),key=this.sessKey(sc);
+    const SL={inaug:'Inaugural',photo:'Photography',film:'Filmmaking',motion:'Motion Design',graphic:'Graphic Design',walk:'Photo Walk',exhibition:'Exhibition'};
+    let ses=SL[sc.session]; if(sc.session==='walk') ses+=' · '+(s.cps.find(c=>c.id===sc.cp)||{name:'?'}).name;
+    const t=new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true});
+    let res,att=s.att;
+    if(!r) res={kind:'bad',title:'Token not found',name:'',token:String(raw).trim()||'(empty)',detail:'No registration matches this token. Check the ID and try again.'};
+    else{
+      const why=this.eligible(r,sc.session),prev=s.att[key]&&s.att[key][r.token];
+      if(why) res={kind:'bad',title:'Not eligible',name:r.name,token:r.token,detail:why};
+      else if(prev) res={kind:'dup',title:'Already marked',name:r.name,token:r.token,detail:'Marked present at '+prev.t+' by '+prev.by+'.'};
+      else{ att={...s.att,[key]:{...(s.att[key]||{}),[r.token]:{t,by:'scanner1'}}}; res={kind:'ok',title:'Marked present',name:r.name,token:r.token,detail:ses+' · '+t}; }
+    }
+    this.setState({att,scan:{...sc,token:'',result:res,log:[{name:r?r.name:'Unknown token',token:res.token,ses,time:t,kind:res.kind},...sc.log].slice(0,8)},lastScan:'Last scan at '+t+'. Refresh to see the latest numbers.'});
+  };
+  sim=kind=>{
+    const s=this.state,key=this.sessKey(s.scan);
+    const f=s.regs.find(r=>{ const e=this.eligible(r,s.scan.session),a=!!(s.att[key]&&s.att[key][r.token]); return kind==='ok'?(!e&&!a):kind==='dup'?(!e&&a):!!e; });
+    if(f) this.doScan(f.token); else this.toast('No sample available for this session');
+  };
+  submitScan=e=>{ e.preventDefault(); this.doScan(this.state.scan.token); };
+
+  signIn=()=>this.setState({role:this.state.loginRole,view:'overview'});
+  signOut=()=>this.setState({role:null});
+
+  renderVals(){
+    const s=this.state,role=s.role,mob=s.w<900,view=s.view;
+    const SESS=[['inaug','Inaugural'],['photo','Photography'],['film','Filmmaking'],['motion','Motion Design'],['graphic','Graphic Design'],['walk','Photo Walk'],['exhibition','Exhibition']];
+    const uni=s.regs.filter(r=>r.type==='universal'),out=s.regs.filter(r=>r.type==='workshop');
+    const cap=parseInt(s.settings.cap,10)||0;
+    const cnt=k=>Object.keys(s.att[k]||{}).length;
+    const sty=(on,dark)=>'min-height:44px;font-size:15px;font-weight:600;padding:0 16px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1.5px solid '+(on?'#EBB65B':(dark?'rgba(244,233,217,.45)':'rgba(42,11,12,.3)'))+';background:'+(on?'#EBB65B':'transparent')+';color:'+(on?'#2E070B':(dark?'#F4E9D9':'#2A0B0C'));
+    const BTN='border-radius:999px;padding:9px 18px;font-weight:700;font-size:14px;cursor:pointer;';
+    const bP=BTN+'background:#A82E17;color:#F4E9D9;border:1.5px solid #A82E17;',bS=BTN+'background:transparent;color:#2A0B0C;border:1.5px solid rgba(42,11,12,.35);',bD=BTN+'background:transparent;color:#A4210F;border:1.5px solid rgba(164,33,15,.5);';
+
+    // login
+    const roleTabs=[['super','Super admin'],['scanner','Scanner']].map(([k,l])=>({label:l,onClick:()=>this.setState({loginRole:k,loginEmail:k==='super'?'admin@radiance.example':'scanner1@radiance.example'}),
+      style:'padding:12px;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;border:1.5px solid #430B10;background:'+(s.loginRole===k?'#430B10':'transparent')+';color:'+(s.loginRole===k?'#F4E9D9':'#430B10')}));
+
+    // scanner
+    const sessChips=SESS.map(([k,l])=>({label:l,onClick:()=>this.setState(st=>({scan:{...st.scan,session:k,result:null}})),style:sty(s.scan.session===k,true)}));
+    const cpChips=s.cps.map(c=>({label:c.name,onClick:()=>this.setState(st=>({scan:{...st.scan,cp:c.id,result:null}})),style:sty(s.scan.cp===c.id,true)}));
+    const rs=s.scan.result;
+    const RC={ok:['#2F7D4F','#FFFFFF'],dup:['#E8B45A','#2E070B'],bad:['#A4210F','#FFFFFF']};
+    const res=rs?{...rs,bg:RC[rs.kind][0],fg:RC[rs.kind][1]}:{bg:'#000',fg:'#fff',title:'',name:'',token:'',detail:''};
+    const LC={ok:'#5FBF85',dup:'#E8B45A',bad:'#FF7A66'};
+
+    // overview
+    const wkEligible=k=>uni.length+out.filter(r=>r.ws.includes(k)).length;
+    const sesBars=[['inaug','Inaugural',uni.length],['photo','Photography',wkEligible('photo')],['film','Filmmaking',wkEligible('film')],['motion','Motion Design',wkEligible('motion')],['graphic','Graphic Design',wkEligible('graphic')],['exhibition','Exhibition',s.regs.length]].map(([k,l,d])=>({label:l,count:cnt(k)+' / '+d,pct:Math.min(100,d?cnt(k)/d*100:0)+'%'}))
+      .concat([{label:'Photo walk (all checkpoints)',count:s.cps.reduce((a,c)=>a+cnt('walk:'+c.id),0)+' boarded',pct:Math.min(100,s.cps.reduce((a,c)=>a+cnt('walk:'+c.id),0)/Math.max(1,Object.values(s.sel).filter(Boolean).length*s.cps.length)*100)+'%'}]);
+    const seatBars=[['photo','Photography'],['film','Filmmaking'],['motion','Motion Design'],['graphic','Graphic Design']].map(([k,l])=>{ const t=out.filter(r=>r.ws.includes(k)).length; return {label:l,count:t+' / '+cap,pct:Math.min(100,cap?t/cap*100:0)+'%',color:t>=cap?'#A4210F':'#A82E17'}; });
+    const ovStats=[{n:String(s.regs.length),l:'Registrations'},{n:String(uni.length),l:'NIT Delhi · Universal Pass'},{n:String(out.length),l:'Outside · Workshop Pass'},{n:String(Object.values(s.att).reduce((a,o)=>a+Object.keys(o).length,0)),l:'Scans recorded'}];
+
+    // exports
+    const attRows=()=>{ const rows=[['Session','Token','Name','Time','Scanned by']]; Object.keys(s.att).forEach(k=>Object.entries(s.att[k]).forEach(([t,v])=>{ const r=s.regs.find(x=>x.token===t); rows.push([k,t,r?r.name:'',v.t,v.by]); })); return rows; };
+    const regRows=()=>[['Token','Name','Gender','Institute','Roll','Year','Branch','Phone','Email','Pass','Workshops','Registered']].concat(s.regs.map(r=>[r.token,r.name,r.gender,r.inst,r.roll,r.year,r.branch,r.phone,r.email,r.type==='universal'?'Universal':'Workshop',r.ws.join('/'),r.at]));
+    const SES5=[['inaug','Inaug'],['photo','Photo'],['film','Film'],['motion','Motion'],['graphic','Design']];
+    const lbData=()=>{
+      const q=s.tq.trim().toLowerCase();
+      let rows=uni.map(r=>({r,n:SES5.filter(([k])=>s.att[k][r.token]).length,eng:s.eng[r.token]||0,sel:!!s.sel[r.token]}));
+      const {key,dir}=s.lb,val={name:x=>x.r.name,roll:x=>x.r.roll,branch:x=>x.r.branch,year:x=>x.r.year,att:x=>x.n,eng:x=>x.eng,sel:x=>x.sel?1:0};
+      SES5.forEach(([k],i)=>val['s'+i]=x=>s.att[k][x.r.token]?1:0);
+      const cmp=(a,b)=>{ const va=val[key](a),vb=val[key](b); return va<vb?-dir:va>vb?dir:0; };
+      rows.sort((a,b)=>cmp(a,b)||b.n-a.n||b.eng-a.eng);
+      if(q) rows=rows.filter(x=>(x.r.name+x.r.roll+x.r.token).toLowerCase().includes(q));
+      if(s.tf==='sel') rows=rows.filter(x=>x.sel); if(s.tf==='unsel') rows=rows.filter(x=>!x.sel);
+      return rows;
+    };
+    const lbCsv=only=>{ const rows=[['Rank','Name','Roll','Branch','Year','Sessions attended','Engagement','Remarks','Selected']]; uni.map(r=>({r,n:SES5.filter(([k])=>s.att[k][r.token]).length,eng:s.eng[r.token]||0})).sort((a,b)=>b.n-a.n||b.eng-a.eng).forEach((x,i)=>{ if(!only||s.sel[x.r.token]) rows.push([i+1,x.r.name,x.r.roll,x.r.branch,x.r.year,x.n+'/5',x.eng,s.rem[x.r.token],s.sel[x.r.token]?'Yes':'No']); }); return rows; };
+
+    // header + view meta
+    const nitems=[['overview','Overview'],['registrations','Registrations'],['leaderboard','Leaderboard'],['competitions','Competitions'],['checkpoints','Checkpoints'],['reminders','Reminder emails'],['sponsors','Sponsors'],['settings','Settings']];
+    const adminNav=nitems.map(([k,l])=>({label:l,onClick:()=>this.setView(k),
+      style:'text-align:left;padding:11px 14px;border-radius:8px;border:0;font-size:15px;font-weight:600;cursor:pointer;background:'+(view===k?'#F4E9D9':'transparent')+';color:'+(view===k?'#2E070B':'#E8D6C4'),
+      chipStyle:'min-height:40px;padding:0 16px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;border:1.5px solid '+(view===k?'#F4E9D9':'rgba(244,233,217,.4)')+';background:'+(view===k?'#F4E9D9':'transparent')+';color:'+(view===k?'#2E070B':'#F4E9D9')}));
+    const act=(label,onClick,st)=>({label,onClick,style:st||bS});
+    let vTitle='',vSub='',topActions=[],isTable=false,isEditor=false,tHead=[],tRows=[],cols='',tMin='',tFilters=[],tSummary='',tSumColor='#2A0B0C',tabs=[],groups=[];
+    const chipsF=(opts)=>opts.map(([k,l])=>({label:l,onClick:()=>this.setState({tf:k}),style:sty(s.tf===k,false)}));
+    const TX='white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+    const HB='border:0;background:transparent;padding:0;text-align:left;font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#4A1E1A;';
+
+    if(view==='overview'){
+      vTitle='Overview'; vSub='Counts update from the latest scans. Refresh to see the newest numbers.';
+      topActions=[act('Refresh',()=>{this.forceUpdate();this.toast('Refreshed');}),act('Registrations CSV',()=>this.csv('registrations.csv',regRows())),act('Attendance CSV',()=>this.csv('attendance.csv',attRows())),act('Filmmaking attendees CSV',()=>{ const rows=[['Token','Name','Institute','Time']]; Object.entries(s.att.film).forEach(([t,v])=>{const r=s.regs.find(x=>x.token===t); rows.push([t,r.name,r.inst,v.t]);}); this.csv('filmmaking-attendees.csv',rows); })];
+    } else if(view==='registrations'){
+      vTitle='Registrations'; vSub='All registered students. Demo data, no backend.'; isTable=true;
+      topActions=[act('Export CSV',()=>this.csv('registrations.csv',regRows()),bP)];
+      const q=s.tq.trim().toLowerCase();
+      let rows=s.regs.filter(r=>(!q||(r.name+r.roll+r.token).toLowerCase().includes(q))&&(s.tf==='all'||(s.tf==='nit'?r.type==='universal':r.type==='workshop')));
+      cols='110px minmax(150px,1.4fr) minmax(120px,1fr) 120px 60px 70px 110px 90px'; tMin='900px';
+      tHead=['Token','Name','Institute','Roll','Year','Branch','Pass','Registered'].map(l=>({label:l,arrow:'',onClick:this.noop,style:HB}));
+      tRows=rows.map(r=>({cells:[
+        {isText:true,t:r.token,style:'font-family:"DM Mono",monospace;font-size:13px;'+TX},{isText:true,t:r.name,style:'font-weight:700;'+TX},{isText:true,t:r.inst,style:TX},
+        {isText:true,t:r.roll,style:'font-family:"DM Mono",monospace;font-size:13px;'+TX},{isText:true,t:r.year,style:TX},{isText:true,t:r.branch,style:TX},
+        {isPill:true,t:r.type==='universal'?'Universal':'Workshop',style:'justify-self:start;font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:3px 10px;'+(r.type==='universal'?'background:#430B10;color:#F4E9D9':'border:1.5px solid #A82E17;color:#A82E17')},
+        {isText:true,t:r.at,style:'color:#6B3A33;'+TX}]}));
+      tFilters=chipsF([['all','All'],['nit','NIT Delhi'],['out','Outside']]); tSummary=rows.length+' of '+s.regs.length+' shown';
+    } else if(view==='leaderboard'){
+      vTitle='Photo walk leaderboard'; vSub='NIT Delhi students ranked by attendance across 5 sessions, ties by engagement. Select up to 90 manually.'; isTable=true;
+      topActions=[act('Export table CSV',()=>this.csv('leaderboard.csv',lbCsv(false))),act('Export shortlist CSV',()=>this.csv('photowalk-shortlist.csv',lbCsv(true)),bP)];
+      const rows=lbData(),nsel=Object.values(s.sel).filter(Boolean).length;
+      cols='40px minmax(140px,1.3fr) 110px 64px 56px 80px repeat(5,58px) 84px minmax(150px,1fr) 90px'; tMin='1240px';
+      const H=[['#',null],['Name','name'],['Roll','roll'],['Branch','branch'],['Year','year'],['Attended','att'],...SES5.map(([k,l],i)=>[l,'s'+i]),['Engage','eng'],['Remarks',null],['Selected','sel']];
+      tHead=H.map(([l,k])=>({label:l,arrow:k&&s.lb.key===k?(s.lb.dir>0?' ↑':' ↓'):'',onClick:k?()=>this.setState(st=>({lb:{key:k,dir:st.lb.key===k?-st.lb.dir:(k==='name'||k==='roll'||k==='branch'||k==='year'?1:-1)}})):this.noop,style:HB+(k?'cursor:pointer;':'')}));
+      tRows=rows.map((x,i)=>{ const t=x.r.token; return {cells:[
+        {isText:true,t:String(i+1),style:'font-family:"DM Mono",monospace;font-size:13px;color:#6B3A33'},{isText:true,t:x.r.name,style:'font-weight:700;'+TX},
+        {isText:true,t:x.r.roll,style:'font-family:"DM Mono",monospace;font-size:13px;'+TX},{isText:true,t:x.r.branch,style:TX},{isText:true,t:x.r.year,style:TX},
+        {isText:true,t:x.n+'/5',style:'font-weight:700;color:'+(x.n>=4?'#2F7D4F':'#2A0B0C')},
+        ...SES5.map(([k])=>{ const on=!!s.att[k][t]; return {isTick:true,mark:on?'✓':'–',style:'font-weight:700;color:'+(on?'#2F7D4F':'rgba(42,11,12,.3)')}; }),
+        {isInput:true,type:'number',v:String(x.eng),ph:'0',onChange:e=>{const v=e.target.value; this.setState(st=>({eng:{...st.eng,[t]:v===''?0:Number(v)}}));}},
+        {isInput:true,type:'text',v:s.rem[t]||'',ph:'Add a remark',onChange:e=>{const v=e.target.value; this.setState(st=>({rem:{...st.rem,[t]:v}}));}},
+        {isToggle:true,t:x.sel?'Selected':'Select',onClick:()=>this.setState(st=>({sel:{...st.sel,[t]:!st.sel[t]}})),style:'justify-self:start;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid '+(x.sel?'#2F7D4F':'rgba(42,11,12,.35)')+';background:'+(x.sel?'#2F7D4F':'transparent')+';color:'+(x.sel?'#fff':'#2A0B0C')}]}; });
+      tFilters=chipsF([['all','All'],['sel','Selected'],['unsel','Not selected']]); tSummary='Selected '+nsel+' / 90'+(nsel>90?' · over the limit':''); tSumColor=nsel>90?'#A4210F':'#2A0B0C';
+    } else if(view==='competitions'||view==='checkpoints'||view==='sponsors'||view==='settings'||view==='reminders'){
+      isEditor=true;
+      const F=(label,value,onChange,o={})=>({label,value,onChange,isArea:!!o.area,isInput:!o.area,type:o.type||'text',span:o.wide?'1 / -1':'auto',hint:o.hint||'',hasHint:!!o.hint,ph:o.ph||''});
+      const card=o=>({title:'',sub:'',badge:'',fields:[],actions:[],lines:[],preview:'',toggleLabel:'',...o,hasSub:!!o.sub,hasBadge:!!o.badge,hasToggle:!!o.toggleClick,hasLogo:!!o.hasLogo,hasPreview:!!o.preview,hasLines:!!(o.lines&&o.lines.length),hasActions:!!(o.actions&&o.actions.length)});
+      const hasH=(heading,cards)=>({heading,hasHeading:!!heading,cards});
+      if(view==='competitions'){
+        vTitle='Competitions'; vSub='Add, edit, reorder and delete. Switch each one between Live and Coming soon.';
+        topActions=[act('Add Unstop competition',()=>this.add('onl',{title:'New competition',genre:'',prize:'',theme:'',deadline:'',link:'',desc:'',live:false})),act('Add in-campus competition',()=>this.add('cam',{title:'New in-campus competition',genre:'',prize:'',theme:'',deadline:'',link:'',desc:'',live:false}))];
+        const mk=(key,list,linkLabel)=>list.map((c,i)=>card({title:c.title||'Untitled',sub:c.genre,toggleClick:()=>this.setIn(key,c.id,{live:!c.live}),toggleLabel:c.live?'Live':'Coming soon',
+          toggleStyle:'border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;border:1.5px solid '+(c.live?'#2F7D4F':'rgba(42,11,12,.4)')+';background:'+(c.live?'#2F7D4F':'transparent')+';color:'+(c.live?'#fff':'#2A0B0C'),
+          fields:[F('Title',c.title,this.fld(key,c.id,'title'),{wide:true}),F('Genre',c.genre,this.fld(key,c.id,'genre')),F('Prize',c.prize,this.fld(key,c.id,'prize')),F('Theme',c.theme,this.fld(key,c.id,'theme'),{ph:'Announced 26 Oct'}),F('Deadline',c.deadline,this.fld(key,c.id,'deadline'),{ph:'Announced 26 Oct'}),F(linkLabel,c.link,this.fld(key,c.id,'link'),{wide:true,ph:'https://'}),F('Description',c.desc,this.fld(key,c.id,'desc'),{area:true,wide:true})],
+          actions:[act('↑ Up',()=>this.move(key,c.id,-1)),act('↓ Down',()=>this.move(key,c.id,1)),act('Delete',()=>this.del(key,c.id),bD)]}));
+        groups=[hasH('Online · Unstop',mk('onl',s.onl,'Unstop URL')),hasH('In-campus · Google Forms',mk('cam',s.cam,'Google Form URL'))];
+      } else if(view==='checkpoints'){
+        vTitle='Photo walk checkpoints'; vSub='Locations are revealed later. Expect 4–5. Students are scanned when boarding the bus at each one.';
+        topActions=[act('Add checkpoint',()=>this.add('cps',{name:'New location'}),bP)];
+        groups=[hasH('',s.cps.map((c,i)=>card({title:'Checkpoint '+(i+1),badge:cnt('walk:'+c.id)+' boarded',fields:[F('Location name',c.name,this.fld('cps',c.id,'name'),{wide:true})],
+          actions:[act('↑ Up',()=>this.move('cps',c.id,-1)),act('↓ Down',()=>this.move('cps',c.id,1)),act('Remove',()=>this.del('cps',c.id),bD)]})))];
+      } else if(view==='sponsors'){
+        vTitle='Sponsors'; vSub='The first sponsor is the title sponsor and appears in the header, footer, ticket and emails.';
+        topActions=[act('Add sponsor',()=>this.add('sponsors',{name:'New sponsor',tier:'Associate Sponsor',tagline:'',link:''}),bP)];
+        groups=[hasH('',s.sponsors.map((c,i)=>card({title:c.name||'Untitled',badge:i===0?'Title sponsor':'',hasLogo:true,
+          fields:[F('Name',c.name,this.fld('sponsors',c.id,'name')),F('Tier',c.tier,this.fld('sponsors',c.id,'tier')),F('Tagline',c.tagline,this.fld('sponsors',c.id,'tagline'),{wide:true}),F('Website',c.link,this.fld('sponsors',c.id,'link'),{wide:true,ph:'https://'})],
+          actions:[act('↑ Up',()=>this.move('sponsors',c.id,-1)),act('↓ Down',()=>this.move('sponsors',c.id,1)),act('Remove',()=>this.del('sponsors',c.id),bD)]})))];
+      } else if(view==='settings'){
+        vTitle='Settings'; vSub='Seat caps, venue text, notes shown on the website and consent wording.';
+        topActions=[act('Save changes',()=>this.toast('Settings saved'),bP)];
+        const st=s.settings,S=this.setS;
+        groups=[hasH('',[
+          card({title:'Seats and venue',fields:[F('Outside seats per workshop',st.cap,S('cap'),{type:'number'}),F('Default venue text',st.venue,S('venue'))]}),
+          card({title:'Info notes',sub:'Shown on the schedule, workshops and inaugural pages.',fields:[F('SRHC campus bus note',st.bus,S('bus'),{area:true,wide:true}),F('Refreshments note',st.refresh,S('refresh'),{area:true,wide:true})]}),
+          card({title:'Consent text · NIT Delhi',fields:[F('Stand-up comedy show guidelines',st.cComedy,S('cComedy'),{area:true,wide:true}),F('Photo walk undertaking',st.cWalk,S('cWalk'),{area:true,wide:true})]}),
+          card({title:'Consent text · outside students',fields:[F('Institute norms guideline',st.cNorms,S('cNorms'),{area:true,wide:true})]})
+        ])];
+      } else {
+        const d=s.days.find(x=>x[0]===s.day),T=s.tpl[s.day];
+        vTitle='Reminder emails'; vSub='Sent automatically at 9:30 AM IST on each event day. Edit the template before it goes out.';
+        tabs=s.days.map(x=>({label:x[1],onClick:()=>this.setState({day:x[0]}),style:sty(s.day===x[0],false)}));
+        const wsKey={27:'photo',28:'film',29:'motion',30:'graphic'}[s.day];
+        const nRec=s.day==='26'?uni.length:s.day==='31'?Object.values(s.sel).filter(Boolean).length:uni.length+out.filter(r=>r.ws.includes(wsKey)).length;
+        const who=s.day==='26'?'all NIT Delhi registrants':s.day==='31'?'students selected for the photo walk':'all NIT Delhi registrants plus outside students who selected this workshop';
+        const fill=t=>t.replace(/\{name\}/g,'Aarav Sharma').replace(/\{token\}/g,'RAD26-0001').replace(/\{venue\}/g,T.venue).replace(/\{event\}/g,d[2]);
+        const log=(kind)=>{ const tm=new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true}); this.setState(st=>({rlog:[tm+' · '+kind+' · '+d[1]+(kind==='Test'?' · 1 recipient':' · '+nRec+' recipients'),...st.rlog]})); this.toast(kind==='Test'?'Test email sent':'Sent to '+nRec+' recipients'); };
+        const setT=k=>e=>{ const v=e.target.value; this.setState(st=>({tpl:{...st.tpl,[st.day]:{...st.tpl[st.day],[k]:v}}})); };
+        groups=[hasH('',[
+          card({title:'Template · '+d[1],badge:'9:30 AM IST',sub:'Recipients: '+who+' ('+nRec+').',
+            fields:[F('Subject',T.subject,setT('subject'),{wide:true}),F('Venue inside campus',T.venue,setT('venue'),{wide:true}),F('Body',T.body,setT('body'),{area:true,wide:true,hint:'Placeholders: {name} {token} {venue} {event}'}),F('Extra notes',T.notes,setT('notes'),{area:true,wide:true,hint:'Refreshments, SRHC bus info and similar.'})],
+            actions:[act('Send test email',()=>log('Test')),act('Send now',()=>log('Sent'),bP)]}),
+          card({title:'Preview',sub:'Rendered with a sample student.',preview:'Subject: '+fill(T.subject)+'\n\n'+fill(T.body)+(T.notes.trim()?'\n\n'+T.notes:'')+'\n\nTitle Sponsor: Bharat Petroleum'}),
+          card({title:'Send log',lines:s.rlog.length?s.rlog:['Nothing sent yet.']})
+        ])];
+      }
+    }
+
+    return {
+      rootBg:role==='super'?'#F4E9D9':'#2E070B',rootInk:role==='super'?'#2A0B0C':'#F4E9D9',
+      isLogin:!role,isScanner:role==='scanner',isSuper:role==='super',isDesktop:!mob,isMobile:mob,
+      roleTabs,loginEmail:s.loginEmail,onEmail:e=>this.setState({loginEmail:e.target.value}),noop:()=>{},signIn:this.signIn,signOut:this.signOut,
+      loginNote:s.loginRole==='super'?'Super admin: dashboard, tables, CSV export, shortlist and settings. Use on a laptop.':'Scanner admin: scan QR codes at the venue. Use on a phone. Five scanner accounts.',
+      sessChips,isWalk:s.scan.session==='walk',cpChips,scToken:s.scan.token,onToken:e=>{const v=e.target.value; this.setState(st=>({scan:{...st.scan,token:v}}));},submitScan:this.submitScan,
+      hasRes:!!rs,res,simBtns:[{label:'Valid student',onClick:()=>this.sim('ok')},{label:'Duplicate',onClick:()=>this.sim('dup')},{label:'Not eligible',onClick:()=>this.sim('bad')}],
+      hasLog:s.scan.log.length>0,scanLog:s.scan.log.map(l=>({...l,color:LC[l.kind]})),
+      adminNav,vTitle,vSub,topActions,
+      isOverview:view==='overview',isTable,isEditor,ovStats,sesBars,seatBars,lastScan:s.lastScan,
+      tq:s.tq,onTq:e=>this.setState({tq:e.target.value}),tFilters,tSummary,tSumColor,tMin,cols,tHead,tRows,
+      hasTabs:tabs.length>0,tabs,groups,
+      toast:s.toast,hasToast:!!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,8 +1,13 @@
 import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
 import { INAUG_FACTS, INAUG_STEPS } from "@/lib/content";
+import { getSettings } from "@/lib/settings";
 
-export default function Inaugural() {
+export const revalidate = 60;
+
+export default async function Inaugural() {
+  const { venue } = await getSettings();
+  const facts = INAUG_FACTS.map((f) => (f.k === "Venue" ? { ...f, v: venue } : f));
   return (
     <>
       <PageHeader path="/inaugural" />
@@ -32,7 +37,7 @@ export default function Inaugural() {
           </div>
           <div className="flex flex-col rounded-lg border border-cream/25 bg-ink/35 p-[clamp(20px,3vw,32px)]">
             <div className="eyebrow mb-2">Details</div>
-            {INAUG_FACTS.map((f) => (
+            {facts.map((f) => (
               <div key={f.k} className="flex flex-wrap justify-between gap-x-5 gap-y-1 border-t border-cream/[.16] py-3.5">
                 <span className="text-[15px] text-muted">{f.k}</span>
                 <span className="text-right font-semibold">{f.v}</span>

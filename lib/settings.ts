@@ -4,6 +4,7 @@ import { CONSENTS, NOTES } from "./content";
 export type Consent = { key: string; t: string; d: string };
 export type Settings = {
   seat_cap: number;
+  venue: string;
   notes: { k: string; t: string }[];
   consents: { nit: Consent[]; outside: Consent[] };
   competitions_live: boolean;
@@ -11,6 +12,7 @@ export type Settings = {
 
 const DEFAULTS: Settings = {
   seat_cap: 15,
+  venue: "To be announced",
   notes: NOTES,
   consents: CONSENTS,
   competitions_live: process.env.NEXT_PUBLIC_COMPETITIONS_LIVE === "true",

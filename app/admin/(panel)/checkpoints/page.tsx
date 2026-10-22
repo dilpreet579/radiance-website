@@ -1,49 +1,62 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
+import { moveRow, nextPosition } from "@/lib/reorder";
+import { AForm } from "@/components/admin/Toast";
+import { Badge, Card, CardGrid, CardHead, Field, PageTitle, btnD, btnP, btnS, input } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 
-async function save(form: FormData) {
+async function act(form: FormData) {
   "use server";
   await requireAdmin("super");
-  const id = String(form.get("id") ?? "");
-  const row = { name: String(form.get("name")).trim(), position: Number(form.get("position") || 0) };
-  if (!row.name) return;
-  if (id) await db().from("checkpoints").update(row).eq("id", id);
-  else await db().from("checkpoints").insert(row);
-  revalidatePath("/admin/checkpoints");
-}
-async function remove(form: FormData) {
-  "use server";
-  await requireAdmin("super");
-  await db().from("checkpoints").delete().eq("id", String(form.get("id"))); // scans at it cascade-delete
+  const op = String(form.get("op")), id = String(form.get("id") ?? "");
+  const sb = db();
+  if (op === "add") {
+    await sb.from("checkpoints").insert({ name: "New location", position: await nextPosition("checkpoints") });
+  } else if (op === "delete") {
+    await sb.from("checkpoints").delete().eq("id", id); // its scans cascade-delete
+  } else if (op === "up" || op === "down") {
+    await moveRow("checkpoints", id, op === "up" ? -1 : 1);
+  } else {
+    const name = String(form.get("name") ?? "").trim();
+    if (!name) throw new Error("Give the checkpoint a name");
+    await sb.from("checkpoints").update({ name }).eq("id", id);
+  }
   revalidatePath("/admin/checkpoints");
 }
 
-const inp = "rounded border border-fg/30 bg-white px-2 py-1.5 text-sm";
+const MSG = { save: "Saved", add: "Checkpoint added", delete: "Removed", up: "Moved up", down: "Moved down" };
 
 export default async function Page() {
-  await requireAdmin("super");
-  const { data } = await db().from("checkpoints").select("*").order("position");
+  const sb = db();
+  const [{ data: cps }, { data: scans }] = await Promise.all([
+    sb.from("checkpoints").select("id,name").order("position").order("id"),
+    sb.from("scans").select("checkpoint_id").eq("session_key", "walk"),
+  ]);
+  const boarded = (id: string) => (scans ?? []).filter((s) => s.checkpoint_id === id).length;
   return (
-    <div className="flex max-w-xl flex-col gap-3">
-      <h1 className="m-0 font-display text-3xl font-extrabold">Photo walk checkpoints</h1>
-      <p className="m-0 text-sm text-fg-3">Students are scanned at each checkpoint when boarding the bus. Deleting a checkpoint also deletes its scans.</p>
-      {(data ?? []).map((c) => (
-        <form key={c.id} action={save} className="flex gap-2">
-          <input type="hidden" name="id" value={c.id} />
-          <input name="position" type="number" defaultValue={c.position} className={inp + " w-16"} />
-          <input name="name" defaultValue={c.name} className={inp + " flex-1"} />
-          <button className="btn btn-rust px-3 py-1.5 text-sm">Save</button>
-          <button formAction={remove} className="btn border border-err bg-transparent px-3 py-1.5 text-sm text-err">Delete</button>
-        </form>
-      ))}
-      <form action={save} className="mt-3 flex gap-2">
-        <input name="position" type="number" defaultValue={(data?.length ?? 0) + 1} className={inp + " w-16"} />
-        <input name="name" placeholder="New checkpoint (e.g. Purana Qila)" required className={inp + " flex-1"} />
-        <button className="btn btn-rust px-3 py-1.5 text-sm">Add</button>
-      </form>
-    </div>
+    <>
+      <PageTitle title="Photo walk checkpoints" sub="Locations are revealed later. Expect 4–5. Students are scanned when boarding the bus at each one."
+        actions={<AForm action={act} messages={MSG}><button name="op" value="add" className={btnP}>Add checkpoint</button></AForm>} />
+      <CardGrid>
+        {(cps ?? []).map((c, i) => (
+          <Card key={c.id}>
+            <AForm action={act} messages={MSG} confirm={{ delete: "Remove this checkpoint and all scans recorded at it?" }} className="flex flex-col gap-4">
+              <input type="hidden" name="id" value={c.id} />
+              <CardHead title={`Checkpoint ${i + 1}`} right={<Badge>{boarded(c.id)} boarded</Badge>} />
+              <Field label="Location name"><input name="name" defaultValue={c.name} className={input} /></Field>
+              <div className="flex flex-wrap gap-2">
+                <button name="op" value="save" className={btnP}>Save</button>
+                <button name="op" value="up" className={btnS}>↑ Up</button>
+                <button name="op" value="down" className={btnS}>↓ Down</button>
+                <button name="op" value="delete" className={btnD}>Remove</button>
+              </div>
+            </AForm>
+          </Card>
+        ))}
+      </CardGrid>
+      {(cps ?? []).length === 0 && <p className="m-0 text-fg-3">No checkpoints yet.</p>}
+    </>
   );
 }

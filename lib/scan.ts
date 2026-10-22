@@ -1,7 +1,8 @@
 import { db } from "./db";
 
 export type ScanResult =
-  | { status: "ok" | "already"; name: string; token: string; at: string }
+  | { status: "ok"; name: string; token: string; at: string }
+  | { status: "already"; name: string; token: string; at: string; by: string }
   | { status: "ineligible"; name: string; token: string; reason: string }
   | { status: "notfound" | "error"; message: string };
 
@@ -26,10 +27,12 @@ export async function recordScan(rawToken: string, sessionKey: string, checkpoin
   if (sessionKey === NEEDS_CHECKPOINT && !checkpointId) return { status: "error", message: "Pick a checkpoint for the photo walk" };
 
   const no = (reason: string): ScanResult => ({ status: "ineligible", name: reg.name, token, reason });
-  if (session.nit_only && !reg.is_nit) return no(`${session.label} is for NIT Delhi students only`);
-  if (sessionKey === "walk" && !reg.walk_selected) return no("Not selected for the photo walk");
+  if (session.nit_only && !reg.is_nit) {
+    return no(sessionKey === "inaugural" ? "Outside students cannot attend the inaugural ceremony." : "This session is for NIT Delhi students only.");
+  }
+  if (sessionKey === "walk" && !reg.walk_selected) return no("Not selected for the photo walk.");
   if (!reg.is_nit && ["photo", "film", "motion", "graphic"].includes(sessionKey) && !reg.workshops.includes(sessionKey)) {
-    return no("Did not register for this workshop");
+    return no("This student did not register for this workshop.");
   }
 
   const { error } = await sb.from("scans").insert({ registration_id: reg.id, session_key: sessionKey, checkpoint_id: checkpointId, admin_email: adminEmail });
@@ -37,8 +40,8 @@ export async function recordScan(rawToken: string, sessionKey: string, checkpoin
   if (error.code !== "23505") return { status: "error", message: error.message };
 
   // unique violation: already scanned. Show when.
-  let q = sb.from("scans").select("scanned_at").eq("registration_id", reg.id).eq("session_key", sessionKey);
+  let q = sb.from("scans").select("scanned_at,admin_email").eq("registration_id", reg.id).eq("session_key", sessionKey);
   q = checkpointId ? q.eq("checkpoint_id", checkpointId) : q.is("checkpoint_id", null);
   const { data: prev } = await q.maybeSingle();
-  return { status: "already", name: reg.name, token, at: prev?.scanned_at ?? new Date().toISOString() };
+  return { status: "already", name: reg.name, token, at: prev?.scanned_at ?? new Date().toISOString(), by: prev?.admin_email ?? "another scanner" };
 }
