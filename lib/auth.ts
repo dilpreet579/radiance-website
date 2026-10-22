@@ -7,7 +7,7 @@ export type Admin = { email: string; role: "scanner" | "super" };
 
 export async function authClient() {
   const jar = await cookies();
-  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!, {
     cookies: {
       getAll: () => jar.getAll(),
       setAll: (list) => { try { list.forEach(({ name, value, options }) => jar.set(name, value, options)); } catch {} },
