@@ -65,19 +65,20 @@ export default function ScanClient({ email, isSuper, sessions, checkpoints, sign
 
   useEffect(() => {
     if (!on) return;
-    let stop: (() => Promise<void>) | undefined;
-    (async () => {
+    // The start promise is kept so cleanup waits for it: stopping before start resolves (StrictMode, quick Stop tap) leaked the stream.
+    let q: import("html5-qrcode").Html5Qrcode | undefined;
+    const started = (async () => {
       const { Html5Qrcode } = await import("html5-qrcode");
-      const q = new Html5Qrcode("reader");
+      q = new Html5Qrcode("reader");
       await q.start({ facingMode: "environment" }, { fps: 8, qrbox: 200 }, (text) => {
         const now = Date.now();
         if (text === last.current.t && now - last.current.at < 3000) return; // camera re-reads the same code
         last.current = { t: text, at: now };
         submit(text);
       }, () => {});
-      stop = async () => { await q.stop(); q.clear(); };
-    })().catch(() => { setOn(false); setBanner({ kind: "bad", title: "Camera unavailable", name: "", token: "", detail: "Allow camera access, or type the token below." }); });
-    return () => { stop?.(); };
+    })();
+    started.catch((e) => { setOn(false); setBanner({ kind: "bad", title: "Camera unavailable", name: "", token: "", detail: `${e?.name ?? e?.message ?? e}. Allow camera access, or type the token below.` }); });
+    return () => { started.then(() => q?.stop().then(() => q?.clear()), () => {}); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [on]);
 
