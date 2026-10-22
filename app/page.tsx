@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Carousel from "@/components/Carousel";
 import { LogoSlot, Notes, RegisterBtn } from "@/components/ui";
 import { COLLABS, DISCIPLINES, SCHEDULE, SPEAKERS, STATS } from "@/lib/content";
@@ -26,15 +27,13 @@ export default async function Home() {
           <div className="flex flex-wrap items-center justify-center gap-x-11 gap-y-3.5">
             <div className="font-display text-[clamp(34px,5vw,56px)] font-extrabold leading-none tracking-[-.02em] text-gold">26 Oct – 5 Nov</div>
             <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2.5 text-[15px] text-soft">
-              <span className="max-sm:basis-full max-sm:text-center">In association with</span>
+              <span className="max-sm:basis-full max-sm:text-center">Presented by</span>
               <LogoSlot h={40} logo={sponsor.logo_url} />
               <span className="font-bold text-cream">{sponsor.name}</span>
-              <span className="rounded-[3px] border border-gold/60 px-2 py-[3px] font-mono text-[11px] uppercase tracking-[.12em] text-gold">Title Sponsor</span>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-3.5">
-            <RegisterBtn className="px-[30px] py-4 text-[17px]">Register now</RegisterBtn>
-            <Link href="/competitions" className="btn btn-ghost px-[30px] py-4 text-[17px]">Competitions on Unstop <span>↗</span></Link>
+          <div className="flex justify-center">
+            <RegisterBtn className="px-[38px] py-[18px] text-[18px] font-bold shadow-md hover:scale-[1.02] transition-transform">Register now</RegisterBtn>
           </div>
         </div>
       </section>
@@ -129,11 +128,20 @@ export default async function Home() {
           )}
           <div className="flex flex-col gap-[22px] border-t border-fg/20 pt-[clamp(32px,4vw,48px)]">
             <div className="eyebrow !text-rust">Past collaborators</div>
-            <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(170px,1fr))]">
+            <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
               {COLLABS.map((c) => (
-                <div key={c.n} className="flex min-h-[104px] flex-col items-center justify-center gap-1 border-[1.5px] border-dashed border-rust/45 p-3.5 text-center [background:repeating-linear-gradient(135deg,rgba(168,46,23,.07)_0_10px,transparent_10px_20px)]">
-                  <span className="font-display text-lg font-bold leading-[1.15]">{c.n}</span>
-                  <span className="font-mono text-[11px] uppercase tracking-[.1em] text-rust-dk">{c.s}</span>
+                <div key={c.n} className="flex min-h-[136px] flex-col items-center justify-between gap-3 rounded-lg border border-fg/15 bg-cream/60 p-4 text-center transition-all hover:bg-cream hover:shadow-sm">
+                  <div className="relative flex h-12 w-full max-w-[150px] items-center justify-center">
+                    {"logo" in c && c.logo ? (
+                      <Image src={c.logo} alt={c.n} fill sizes="150px" className="object-contain" />
+                    ) : (
+                      <span className="font-display text-lg font-bold leading-[1.15]">{c.n}</span>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-display text-base font-bold text-fg leading-tight">{c.n}</span>
+                    <span className="font-mono text-[11px] uppercase tracking-[.1em] text-fg-2">{c.s}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -158,7 +166,7 @@ export default async function Home() {
             {SPEAKERS.map((n, i) => (
               <div key={n} className="flex items-baseline gap-6 border-t border-cream/20 py-[clamp(14px,2vw,22px)]">
                 <span className="basis-7 font-mono text-[13px] text-gold">0{i + 1}</span>
-                <span className="font-display text-[clamp(30px,5.4vw,68px)] font-extrabold leading-[1.02] tracking-[-.025em]">{n}</span>
+                <span className="font-display text-[clamp(20px,3vw,34px)] font-bold leading-tight tracking-[-.015em]">{n}</span>
               </div>
             ))}
           </div>

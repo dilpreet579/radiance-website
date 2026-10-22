@@ -10,7 +10,7 @@ export const revalidate = 60;
 export const metadata = pageMeta("/workshops");
 
 export default async function Workshops() {
-  const { notes: NOTES, seat_cap } = await getSettings();
+  const { notes, seat_cap } = await getSettings();
   return (
     <>
       <PageHeader path="/workshops" />
@@ -25,7 +25,17 @@ export default async function Workshops() {
           </div>
 
           {WORKSHOPS.map((w, i) => (
-            <section key={w.n} className="grid items-start gap-[clamp(28px,5vw,72px)] border-t border-cream/20 pt-[clamp(32px,4vw,56px)] [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
+            <section key={w.n} className="flex flex-col min-[700px]:grid min-[700px]:items-start gap-[clamp(28px,5vw,72px)] border-t border-cream/20 pt-[clamp(32px,4vw,56px)] min-[700px]:[grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
+              {/* Header Info: on mobile it shows FIRST at the top */}
+              <div className="flex flex-col gap-3 min-[700px]:hidden">
+                <div className="font-mono text-[13px] uppercase tracking-[.14em] text-gold">Workshop {w.n} · {w.date}</div>
+                <h2 className="m-0 text-balance font-display text-[clamp(32px,4.6vw,60px)] font-extrabold leading-none tracking-[-.02em]">{w.title}</h2>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {[w.time, "NIT Delhi + outside (limited)"].map((c) => <span key={c} className="chip !px-3.5 !py-1.5">{c}</span>)}
+                </div>
+              </div>
+
+              {/* Photo Box: on mobile sits right after the title and chips */}
               {w.photo.startsWith("/") ? (
                 <div className={`relative aspect-[4/5] max-h-[560px] w-full overflow-hidden rounded-lg ${i % 2 ? "min-[700px]:order-2" : ""}`}>
                   <Image
@@ -35,18 +45,23 @@ export default async function Workshops() {
                     className="object-cover"
                     style={{ objectPosition: "center 40%" }}
                     sizes="(max-width: 700px) 100vw, 800px"
-                    quality={90}
                   />
                 </div>
               ) : (
                 <Placeholder label={w.photo} className={`aspect-[4/5] max-h-[560px] w-full ${i % 2 ? "min-[700px]:order-2" : ""}`} />
               )}
+
+              {/* Details Column: On desktop contains title + chips + details; on mobile shows the remaining details (badge, speaker, bio) */}
               <div className="flex flex-col gap-5">
-                <div className="font-mono text-[13px] uppercase tracking-[.14em] text-gold">Workshop {w.n} · {w.date}</div>
-                <h2 className="m-0 text-balance font-display text-[clamp(34px,4.6vw,60px)] font-extrabold leading-none tracking-[-.02em]">{w.title}</h2>
-                <div className="flex flex-wrap gap-2">
-                  {[w.time, "NIT Delhi + outside (limited)"].map((c) => <span key={c} className="chip !px-3.5 !py-1.5">{c}</span>)}
+                {/* Desktop-only Title & Chips */}
+                <div className="hidden min-[700px]:flex min-[700px]:flex-col min-[700px]:gap-5">
+                  <div className="font-mono text-[13px] uppercase tracking-[.14em] text-gold">Workshop {w.n} · {w.date}</div>
+                  <h2 className="m-0 text-balance font-display text-[clamp(34px,4.6vw,60px)] font-extrabold leading-none tracking-[-.02em]">{w.title}</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {[w.time, "NIT Delhi + outside (limited)"].map((c) => <span key={c} className="chip !px-3.5 !py-1.5">{c}</span>)}
+                  </div>
                 </div>
+
                 <div className="flex items-center gap-4 border-y border-cream/20 py-[18px]">
                   <span className="font-display text-[clamp(28px,4vw,44px)] font-extrabold leading-none tracking-[-.02em] text-gold">{w.big}</span>
                   {w.bigLogo ? (
@@ -80,7 +95,7 @@ export default async function Workshops() {
             </section>
           ))}
 
-          <div className="border-t border-cream/20 pt-7"><Notes items={NOTES} /></div>
+          <div className="border-t border-cream/20 pt-7"><Notes items={notes} /></div>
         </div>
       </main>
     </>

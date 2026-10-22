@@ -11,9 +11,9 @@ export default function PhotoWalk() {
       <main className="bg-panel pb-[clamp(56px,8vw,112px)] pt-[clamp(40px,6vw,80px)]">
         <div className="wrap flex flex-col gap-[clamp(40px,6vw,72px)]">
           <div className="grid items-center gap-[clamp(28px,5vw,72px)] [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
-            <div className="flex items-baseline gap-[18px]">
-              <span className="font-display text-[clamp(120px,20vw,240px)] font-extrabold leading-[.85] tracking-[-.05em] text-gold">90</span>
-              <span className="font-display text-[clamp(22px,2.6vw,30px)] font-bold leading-[1.15]">NIT Delhi students selected</span>
+            <div className="flex items-center gap-4 sm:gap-6">
+              <span className="font-display text-[clamp(88px,16vw,200px)] font-extrabold leading-none tracking-[-.05em] text-gold">90</span>
+              <span className="font-display text-[clamp(20px,2.6vw,30px)] font-bold leading-tight max-w-[200px] sm:max-w-[260px]">NIT Delhi students selected</span>
             </div>
             <div className="flex flex-col gap-3.5">
               <div className="eyebrow">How selection works</div>
