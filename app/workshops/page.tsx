@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
 import { Notes, Placeholder } from "@/components/ui";
 import { WORKSHOPS } from "@/lib/content";
@@ -25,20 +26,45 @@ export default async function Workshops() {
 
           {WORKSHOPS.map((w, i) => (
             <section key={w.n} className="grid items-start gap-[clamp(28px,5vw,72px)] border-t border-cream/20 pt-[clamp(32px,4vw,56px)] [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
-              <Placeholder label={w.photo} className={`aspect-[4/5] max-h-[560px] w-full ${i % 2 ? "min-[700px]:order-2" : ""}`} />
+              {w.photo.startsWith("/") ? (
+                <div className={`relative aspect-[4/5] max-h-[560px] w-full overflow-hidden rounded-lg ${i % 2 ? "min-[700px]:order-2" : ""}`}>
+                  <Image
+                    src={w.photo}
+                    alt={w.speaker}
+                    fill
+                    className="object-cover"
+                    style={{ objectPosition: "center 40%" }}
+                    sizes="(max-width: 700px) 100vw, 800px"
+                    quality={90}
+                  />
+                </div>
+              ) : (
+                <Placeholder label={w.photo} className={`aspect-[4/5] max-h-[560px] w-full ${i % 2 ? "min-[700px]:order-2" : ""}`} />
+              )}
               <div className="flex flex-col gap-5">
                 <div className="font-mono text-[13px] uppercase tracking-[.14em] text-gold">Workshop {w.n} · {w.date}</div>
                 <h2 className="m-0 text-balance font-display text-[clamp(34px,4.6vw,60px)] font-extrabold leading-none tracking-[-.02em]">{w.title}</h2>
-                <div className="text-[19px] font-semibold">{w.by}</div>
                 <div className="flex flex-wrap gap-2">
                   {[w.time, "NIT Delhi + outside (limited)"].map((c) => <span key={c} className="chip !px-3.5 !py-1.5">{c}</span>)}
                 </div>
-                <div className="flex items-baseline gap-3.5 border-y border-cream/20 py-[18px]">
-                  <span className="font-display text-[clamp(40px,5vw,60px)] font-extrabold leading-none tracking-[-.02em] text-gold">{w.big}</span>
-                  <span className="text-[15px] text-muted">{w.bigLabel}</span>
+                <div className="flex items-center gap-4 border-y border-cream/20 py-[18px]">
+                  <span className="font-display text-[clamp(28px,4vw,44px)] font-extrabold leading-none tracking-[-.02em] text-gold">{w.big}</span>
+                  {w.bigLogo ? (
+                    <div className="relative h-10 w-28 overflow-hidden rounded-md shadow-md">
+                      <Image
+                        src={w.bigLogo}
+                        alt="Nikon Logo"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <span className="text-[15px] text-muted">{w.bigLabel}</span>
+                  )}
                 </div>
                 <div>
                   <div className="font-display text-[22px] font-bold">{w.speaker}</div>
+                  {w.role && <div className="mb-1 font-mono text-xs uppercase tracking-[.12em] text-gold">{w.role}</div>}
                   <p className="mb-0 mt-1.5 text-pretty text-soft">{w.bio}</p>
                 </div>
                 {w.points.length > 0 && (

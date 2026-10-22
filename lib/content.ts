@@ -22,8 +22,8 @@ export const PAGE_META: Record<string, { eyebrow: string; title: string; lead: s
   "/workshops": {
     eyebrow: "Workshops · 27–30 Oct",
     title: "Four workshops with working creators",
-    lead: "Photography, filmmaking, motion design and graphic design. This page is information only; everyone registers once on the registration page.",
-    chips: ["2–3 hours each", "NIT Delhi + limited outside seats", "Free for outside students"],
+    lead: "Photography, filmmaking, motion design and graphic design. Explore your creativity through hands-on workshops led by industry professionals. Registration is available on the main registration page.",
+    chips: ["2–3 hours each", "NIT Delhi + limited outside seats", "Free for all"],
   },
   "/inaugural": {
     eyebrow: "Inaugural · 26 Oct",
@@ -56,7 +56,7 @@ export const SCHEDULE = [
   { day: "27", mon: "Oct", dow: "Tue", title: "Photography Workshop", sub: "Powered by Nikon", time: "5:30–7:30 PM · 2 hrs", who: "NIT Delhi + outside (limited)", href: "/workshops" },
   { day: "28", mon: "Oct", dow: "Wed", title: "Cinematic Filmmaking Workshop", sub: "By Shoot Guru", time: "3:30–6:30 PM · 3 hrs", who: "NIT Delhi + outside (limited)", href: "/workshops" },
   { day: "29", mon: "Oct", dow: "Thu", title: "Motion Design Workshop", sub: "By Motion Nations (Abhishek)", time: "5:30–7:30 PM · 2 hrs", who: "NIT Delhi + outside (limited)", href: "/workshops" },
-  { day: "30", mon: "Oct", dow: "Fri", title: "Graphic Design Workshop", sub: "By Gaurav Dholia", time: "5:30–7:30 PM · 2 hrs", who: "NIT Delhi + outside (limited)", href: "/workshops" },
+  { day: "30", mon: "Oct", dow: "Fri", title: "Graphic Design Workshop", sub: "By Gaurav Doliya", time: "5:30–7:30 PM · 2 hrs", who: "NIT Delhi + outside (limited)", href: "/workshops" },
   { day: "31", mon: "Oct", dow: "Sat", title: "Delhi Photo Walk", sub: "Multi-location, by institute bus", time: "Entire day", who: "90 selected NIT Delhi students", href: "/photowalk" },
   { day: "4", mon: "Nov", dow: "Wed", title: "Grand Exhibition, Day 1", sub: "Halloween theme", time: "3:30–10:00 PM", who: "Everyone · no registration", href: "/exhibition" },
   { day: "5", mon: "Nov", dow: "Thu", title: "Grand Exhibition, Day 2", sub: "Plus the closing of Radiance", time: "5:30–10:00 PM", who: "Everyone · no registration", href: "/exhibition" },
@@ -75,7 +75,7 @@ export const STATS = [
 ];
 
 export const DISCIPLINES = ["Photography", "Filmmaking", "Motion Design", "Graphic Design"];
-export const SPEAKERS = ["Ayush Kumar Tripathi", "Gaurav Dholia", "Shivam", "Anurag Roy", "Nitin Chandra"];
+export const SPEAKERS = ["Ayush Kumar Tripathi", "Gaurav Doliya", "Shivam", "Anurag Roy", "Nitin Chandra"];
 export const COLLABS = [
   { n: "Dice Academy", s: "logo" },
   { n: "Olympus Cameras", s: "logo" },
@@ -86,10 +86,10 @@ export const COLLABS = [
 export const SLIDES = ["Inaugural", "Workshops", "Photo walk", "Exhibition", "Winners"];
 
 export const WORKSHOPS = [
-  { n: "01", date: "Tue 27 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Photography Workshop", by: "Powered by Nikon", speaker: "Speaker to be announced", bio: "The speaker name and bio for the Nikon-powered photography workshop will be added here.", big: "Nikon", bigLabel: "Powered by", points: [] as string[], social: "Speaker social links", url: "", photo: "Nikon speaker" },
-  { n: "02", date: "Wed 28 Oct", time: "3:30–6:30 PM · 3 hrs", title: "Cinematic Filmmaking Workshop", by: "By Shoot Guru", speaker: "Kshitij Sheetak · Shoot Guru", bio: "Kshitij Sheetak of Shoot Guru teaches cinematography and basic video editing. Shoot Guru has 207K followers on Instagram.", big: "207K", bigLabel: "Instagram followers", points: ["Cinematography", "Basic video editing", "Participants are split into crews and make a short film on a given topic", "The best film wins prizes"], social: "Shoot Guru on Instagram", url: "https://www.instagram.com/shootguru", photo: "Kshitij Sheetak" },
-  { n: "03", date: "Thu 29 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Motion Design Workshop", by: "By Motion Nations", speaker: "Abhishek · Motion Nations", bio: "Abhishek runs Motion Nations, a YouTube channel with 250K+ subscribers, and teaches motion designing.", big: "250K+", bigLabel: "YouTube subscribers", points: ["Motion designing"], social: "Motion Nations on YouTube", url: "https://www.youtube.com/@MotionNations", photo: "Abhishek" },
-  { n: "04", date: "Fri 30 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Graphic Design Workshop", by: "By Gaurav Dholia", speaker: "Gaurav Dholia", bio: "Gaurav Dholia is an expert graphic designer with many years of experience. He also spoke at a previous Radiance.", big: "Returning", bigLabel: "Past Radiance speaker", points: [] as string[], social: "Gaurav Dholia on Instagram", url: "", photo: "Gaurav Dholia" },
+  { n: "01", date: "Tue 27 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Photography Workshop", by: "Powered by Nikon", speaker: "Manvindra", role: "Technical Officer", bio: "Manvindra is a veteran photographer with extensive experience in photography and visual storytelling. Powered by Nikon, this workshop brings expert insights into photography techniques, creative vision, and the art of capturing stunning images.", big: "Powered by", bigLabel: "", bigLogo: "/nikon.jpeg", points: [] as string[], social: "Speaker social links", url: "", photo: "/manvindra.jpg" },
+  { n: "02", date: "Wed 28 Oct", time: "3:30–6:30 PM · 3 hrs", title: "Cinematic Filmmaking Workshop", by: "By Shoot Guru", speaker: "Kshitij Sheetak · Shoot Guru", bio: "ShootGuru is a filmmaking and photography platform built to help aspiring creators learn through practical experiences, industry exposure and real-world creative projects. Through workshops, training sessions and creator-focused initiatives, ShootGuru aims to bridge the gap between learning the craft and actually working in the creative industry.", big: "207K", bigLabel: "Instagram followers", points: ["Cinematography", "Basic video editing", "Participants are split into crews and make a short film on a given topic", "The best film wins prizes"], social: "Shoot Guru on Instagram", url: "https://www.instagram.com/shootguru", photo: "/shootguru.jpg", role: "", bigLogo: "" },
+  { n: "03", date: "Thu 29 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Motion Design Workshop", by: "By Motion Nations", speaker: "Abhishek · Motion Nations", bio: "Abhishek is the creator behind Motion Nations, a YouTube channel with 350K+ subscribers, where he shares his expertise in motion design, animation, and creative workflows. Passionate about bringing visuals to life, he helps aspiring designers explore motion graphics, visual storytelling, and industry-relevant techniques.", big: "350K+", bigLabel: "YouTube subscribers", points: ["Motion Graphics & Animation", "Visual Storytelling", "Creative Workflows & Techniques"], social: "Motion Nations on YouTube", url: "https://www.youtube.com/@MotionNations", photo: "/abhishek.jpg", role: "", bigLogo: "" },
+  { n: "04", date: "Fri 30 Oct", time: "5:30–7:30 PM · 2 hrs", title: "Graphic Design Workshop", by: "By Gaurav Doliya", speaker: "Gaurav Doliya", bio: "Gaurav Doliya is a graphic and motion design educator with seven years of experience training students in Adobe tools, design process, and post-production. He currently leads as Academic Director at IRO Design Academy, focusing on practical briefs, critique, and portfolio development.", big: "Returning", bigLabel: "Past Radiance speaker", points: [] as string[], social: "Gaurav Doliya on Instagram", url: "", photo: "/gaurav-doliya.jpg", role: "", bigLogo: "" },
 ];
 
 export const INAUG_STEPS = [
