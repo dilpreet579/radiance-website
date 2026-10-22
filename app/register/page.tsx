@@ -1,8 +1,10 @@
 import PageHeader from "@/components/PageHeader";
+import { pageMeta } from "@/lib/seo";
 import { getSettings, seatsTaken } from "@/lib/settings";
 import RegisterForm from "./RegisterForm";
 
 export const dynamic = "force-dynamic";
+export const metadata = pageMeta("/register", "Register");
 
 export default async function Register() {
   const [s, taken] = await Promise.all([getSettings(), seatsTaken()]);

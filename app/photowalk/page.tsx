@@ -1,5 +1,8 @@
 import PageHeader from "@/components/PageHeader";
 import { WALK_INFO, WALK_SESSIONS } from "@/lib/content";
+import { pageMeta } from "@/lib/seo";
+
+export const metadata = pageMeta("/photowalk");
 
 export default function PhotoWalk() {
   return (

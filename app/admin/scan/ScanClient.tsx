@@ -65,19 +65,20 @@ export default function ScanClient({ email, isSuper, sessions, checkpoints, sign
 
   useEffect(() => {
     if (!on) return;
-    let stop: (() => Promise<void>) | undefined;
-    (async () => {
+    // The start promise is kept so cleanup waits for it: stopping before start resolves (StrictMode, quick Stop tap) leaked the stream.
+    let q: import("html5-qrcode").Html5Qrcode | undefined;
+    const started = (async () => {
       const { Html5Qrcode } = await import("html5-qrcode");
-      const q = new Html5Qrcode("reader");
+      q = new Html5Qrcode("reader");
       await q.start({ facingMode: "environment" }, { fps: 8, qrbox: 200 }, (text) => {
         const now = Date.now();
         if (text === last.current.t && now - last.current.at < 3000) return; // camera re-reads the same code
         last.current = { t: text, at: now };
         submit(text);
       }, () => {});
-      stop = async () => { await q.stop(); q.clear(); };
-    })().catch(() => { setOn(false); setBanner({ kind: "bad", title: "Camera unavailable", name: "", token: "", detail: "Allow camera access, or type the token below." }); });
-    return () => { stop?.(); };
+    })();
+    started.catch((e) => { setOn(false); setBanner({ kind: "bad", title: "Camera unavailable", name: "", token: "", detail: `${e?.name ?? e?.message ?? e}. Allow camera access, or type the token below.` }); });
+    return () => { started.then(() => q?.stop().then(() => q?.clear()), () => {}); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [on]);
 
@@ -123,7 +124,10 @@ export default function ScanClient({ email, isSuper, sessions, checkpoints, sign
         )}
 
         <div className="relative grid aspect-[4/3] max-h-60 w-full place-items-center overflow-hidden border border-cream/25 [background:repeating-linear-gradient(135deg,rgba(244,233,217,.08)_0_14px,rgba(244,233,217,.02)_14px_28px)]">
-          <div id="reader" className={`absolute inset-0 [&_video]:h-full [&_video]:w-full [&_video]:object-cover ${on ? "" : "hidden"}`} />
+          {/* html5-qrcode overwrites #reader's inline style (position: relative), so sizing lives on this wrapper */}
+          <div className={`absolute inset-0 [&_video]:h-full [&_video]:w-full [&_video]:object-cover ${on ? "" : "hidden"}`}>
+            <div id="reader" className="h-full w-full" />
+          </div>
           <span className={`${corner} left-[18px] top-[18px] border-l-4 border-t-4`} />
           <span className={`${corner} right-[18px] top-[18px] border-r-4 border-t-4`} />
           <span className={`${corner} bottom-[18px] left-[18px] border-b-4 border-l-4`} />

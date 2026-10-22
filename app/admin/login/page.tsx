@@ -23,10 +23,8 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
     <main className="pattern-bg grid min-h-screen place-items-center p-6 text-cream">
       <div className="flex w-[min(440px,100%)] flex-col gap-[22px]">
         <div className="rounded-md bg-cream px-3.5 py-2.5 shadow-[8px_8px_0_#1E0407]">
-          <div className="aspect-[2172/510] overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/radiance26-logo.png" alt="Radiance 2026" className="-mt-[3.2%] block w-full" />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/radiance26-logo.png" alt="Radiance 2026" className="block w-full" />
         </div>
         <form action={login} className="flex flex-col gap-[18px] rounded-[10px] bg-cream p-[clamp(22px,4vw,32px)] text-fg">
           <div className="font-display text-[30px] font-extrabold leading-none">Admin sign in</div>

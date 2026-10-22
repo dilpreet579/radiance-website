@@ -146,10 +146,8 @@ function TicketView({ ticket: t, dup, emailed, again }: { ticket: Ticket; dup: b
       <div className="w-full basis-[380px] overflow-hidden rounded-[18px] bg-cream text-fg shadow-[12px_12px_0_#1E0407] sm:max-w-[380px]">
         <div className="pattern-bg px-[18px] py-4">
           <div className="rounded-md bg-cream px-2.5 py-1">
-            <div className="aspect-[2172/510] overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/radiance26-logo.png" alt="Radiance 2026" className="-mt-[3.2%] block w-full" />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/radiance26-logo.png" alt="Radiance 2026" className="block w-full" />
           </div>
         </div>
         <div className="flex flex-col gap-2 px-[26px] pb-5 pt-[22px]">

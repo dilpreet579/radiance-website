@@ -1,3 +1,4 @@
+import QRCode from "qrcode";
 import { db } from "./db";
 import { fillTemplate, reminderHtml, sendMail, type SponsorInfo } from "./email";
 import { getTitleSponsor } from "./sponsors";
@@ -18,9 +19,16 @@ export async function recipientsFor(t: Pick<Template, "audience" | "workshop_key
 
 export const bodyWithNotes = (t: Pick<Template, "body" | "notes">) => (t.notes?.trim() ? `${t.body}\n\n${t.notes.trim()}` : t.body);
 
-export const renderReminder = (t: Template, r: Reg, sponsor: SponsorInfo) => {
+export const renderReminder = async (t: Template, r: Reg, sponsor: SponsorInfo) => {
   const v = { name: r.name, token: r.token, venue: t.venue, event: t.event };
-  return { subject: fillTemplate(t.subject, v), text: fillTemplate(bodyWithNotes(t), v), html: reminderHtml(fillTemplate(bodyWithNotes(t), v), sponsor) };
+  const body = fillTemplate(bodyWithNotes(t), v);
+  const qr = await QRCode.toBuffer(r.token, { errorCorrectionLevel: "M", margin: 1, width: 240, color: { dark: "#2A0B0C", light: "#FBF5EA" } });
+  return {
+    subject: fillTemplate(t.subject, v),
+    text: body,
+    html: reminderHtml(body, sponsor, { day: t.day, event: t.event, venue: t.venue, token: r.token }),
+    attachments: [{ filename: `${r.token}.png`, content: qr, contentId: "qr" }],
+  };
 };
 
 // Sends to everyone for the day who has not already received it (safe to re-run / cron retry).
@@ -37,9 +45,9 @@ export async function sendDay(day: string): Promise<{ sent: number; failed: numb
   let sent = 0, failed = 0, skipped = 0;
   for (const r of list) {
     if (already.has(r.email)) { skipped++; continue; }
-    const m = renderReminder(t, r, sponsor);
     try {
-      await sendMail(r.email, m.subject, m.html, m.text);
+      const m = await renderReminder(t, r, sponsor);
+      await sendMail(r.email, m.subject, m.html, m.text, m.attachments);
       await sb.from("reminder_log").insert({ day, email: r.email, ok: true });
       sent++;
     } catch (e) {
@@ -53,7 +61,7 @@ export async function sendDay(day: string): Promise<{ sent: number; failed: numb
 export async function sendTest(day: string, to: string) {
   const { data: t } = await db().from("reminder_templates").select("*").eq("day", day).maybeSingle();
   if (!t) throw new Error("No template for that day");
-  const m = renderReminder(t, { name: "Test Student", email: to, token: "RAD26-0000" }, await getTitleSponsor());
-  await sendMail(to, "[TEST] " + m.subject, m.html, m.text);
+  const m = await renderReminder(t, { name: "Test Student", email: to, token: "RAD26-0000" }, await getTitleSponsor());
+  await sendMail(to, "[TEST] " + m.subject, m.html, m.text, m.attachments);
   await db().from("reminder_log").insert({ day, email: to, ok: true, test: true });
 }
