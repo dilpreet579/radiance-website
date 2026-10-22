@@ -1,9 +1,11 @@
 import PageHeader from "@/components/PageHeader";
 import { CAMPUS_COMPS, ONLINE_COMPS } from "@/lib/content";
 import { db, hasDb } from "@/lib/db";
+import { pageMeta } from "@/lib/seo";
 import { getSettings } from "@/lib/settings";
 
 export const revalidate = 60;
+export const metadata = pageMeta("/competitions");
 
 type Comp = { kind: "online" | "campus"; genre: string; title: string; desc: string; prize: string; theme: string; deadline: string; url: string; live: boolean };
 

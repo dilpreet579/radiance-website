@@ -2,6 +2,7 @@ import Link from "next/link";
 import Carousel from "@/components/Carousel";
 import { LogoSlot, Notes, RegisterBtn } from "@/components/ui";
 import { COLLABS, DISCIPLINES, SCHEDULE, SPEAKERS, STATS } from "@/lib/content";
+import { EVENT_LD } from "@/lib/seo";
 import { getSettings } from "@/lib/settings";
 import { getAssociateSponsors, getTitleSponsor } from "@/lib/sponsors";
 
@@ -11,6 +12,7 @@ export default async function Home() {
   const [sponsor, associates, { notes }] = await Promise.all([getTitleSponsor(), getAssociateSponsors(), getSettings()]);
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(EVENT_LD) }} />
       <section className="pattern-bg pb-[clamp(56px,8vw,104px)] pt-[clamp(40px,6vw,80px)]">
         <div className="wrap flex flex-col items-center gap-[clamp(28px,4vw,44px)] text-center">
           <div className="font-mono text-[13px] uppercase tracking-[.14em] text-gold">3rd edition · NIT Delhi Annual Creative Fest</div>

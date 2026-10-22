@@ -1,4 +1,7 @@
 import { EX_DAYS, EX_SECTIONS } from "@/lib/content";
+import { pageMeta } from "@/lib/seo";
+
+export const metadata = pageMeta("/exhibition", "Grand Exhibition · Halloween theme", "The Radiance 2026 Grand Exhibition at NIT Delhi, 4 and 5 November: a Halloween-themed showcase of photography, film and design. Open to everyone, no registration needed.");
 
 const photoCell = "flex aspect-[4/3] flex-col items-center justify-center gap-1.5 p-3 text-center font-mono text-xs uppercase tracking-[.12em] text-hw-lilac border border-[rgba(180,140,235,.35)] [background:repeating-linear-gradient(135deg,rgba(180,140,235,.14)_0_14px,rgba(180,140,235,.04)_14px_28px)]";
 

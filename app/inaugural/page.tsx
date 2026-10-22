@@ -1,9 +1,11 @@
 import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
 import { INAUG_FACTS, INAUG_STEPS } from "@/lib/content";
+import { pageMeta } from "@/lib/seo";
 import { getSettings } from "@/lib/settings";
 
 export const revalidate = 60;
+export const metadata = pageMeta("/inaugural");
 
 export default async function Inaugural() {
   const { venue } = await getSettings();

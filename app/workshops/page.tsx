@@ -2,9 +2,11 @@ import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
 import { Notes, Placeholder } from "@/components/ui";
 import { WORKSHOPS } from "@/lib/content";
+import { pageMeta } from "@/lib/seo";
 import { getSettings } from "@/lib/settings";
 
 export const revalidate = 60;
+export const metadata = pageMeta("/workshops");
 
 export default async function Workshops() {
   const { notes: NOTES, seat_cap } = await getSettings();
