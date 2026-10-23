@@ -135,7 +135,6 @@ export const WALK_INFO = [
 export const ONLINE_COMPS = [
   { genre: "Photography", title: "Theme-Based Photography Competition", desc: "A national-level photography competition for students from colleges across India.", prize: "₹8,000" },
   { genre: "Filmmaking", title: "Film Making Competition", desc: "A short film competition open to filmmakers and film clubs across India.", prize: "₹10,000" },
-  { genre: "Graphic design", title: "Poster Design Competition", desc: "A poster design competition for student designers.", prize: "₹4,000" },
 ];
 export const CAMPUS_COMPS = [
   { genre: "Photography", title: "In-Campus Photography Contest", desc: "Open to NIT Delhi students. Submit your entry through the Google Form.", prize: "₹3,000" },
