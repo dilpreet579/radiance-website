@@ -14,10 +14,21 @@ export type RegInput = {
 };
 export type Ticket = { token: string; name: string; type: string; institute: string; roll: string; email: string; workshops: string[]; qrPath: string; qrBox: number; sponsor: { name: string; logo_url: string } };
 export type RegResult =
-  | { ok: true; dup: boolean; ticket: Ticket; emailed: boolean }
+  | { ok: true; dup: false; ticket: Ticket; emailed: boolean }
+  | { ok: true; dup: true; maskedEmail: string; emailed: boolean }
   | { ok: false; errors: Record<string, string> };
 
 const WS_NAME = Object.fromEntries(WORKSHOP_OPTIONS.map((w) => [w.key, w.name]));
+
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return "***";
+  if (local.length <= 2) return `${local[0]}*@${domain}`;
+  const first = local[0];
+  const last = local[local.length - 1];
+  const middle = "*".repeat(Math.max(1, Math.min(local.length - 2, 4)));
+  return `${first}${middle}${last}@${domain}`;
+}
 
 export async function register(i: RegInput): Promise<RegResult> {
   const s = await getSettings();
@@ -61,12 +72,21 @@ export async function register(i: RegInput): Promise<RegResult> {
     roll: r.roll, email: r.email, workshops: r.workshops.map((w) => WS_NAME[w] ?? w), qrPath, qrBox: n,
     sponsor: { name: sponsor.name, logo_url: sponsor.logo_url },
   };
+
   let emailed = true;
   try {
     await sendTicket(r.email, ticket, data.dup);
   } catch (err) {
     console.error("ticket email", err);
-    emailed = false; // ticket is still shown on screen
+    emailed = false;
   }
-  return { ok: true, dup: data.dup, ticket, emailed };
+
+  // Security fix (IDOR / Ticket Hijacking prevention):
+  // When duplicate details match an existing student, do NOT return the ticket or QR code to the browser.
+  // The ticket is sent strictly to the verified registered email on file, and only a masked confirmation is returned.
+  if (data.dup) {
+    return { ok: true, dup: true, maskedEmail: maskEmail(r.email), emailed };
+  }
+
+  return { ok: true, dup: false, ticket, emailed };
 }

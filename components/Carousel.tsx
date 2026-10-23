@@ -1,14 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { SLIDES } from "@/lib/content";
 
 export default function Carousel() {
   const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
   const n = SLIDES.length;
   const pad = (x: number) => String(x).padStart(2, "0");
   const arrow = "h-12 w-12 cursor-pointer rounded-full border-[1.5px] border-cream/50 bg-transparent text-xl text-cream hover:bg-gold hover:text-bg transition-colors flex items-center justify-center";
+
+  // Automatic slide progression every 4 seconds; pauses on hover or touch
+  useEffect(() => {
+    if (paused) return;
+    const timer = setInterval(() => {
+      setI((prev) => (prev + 1) % n);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [paused, n]);
 
   return (
     <>
@@ -17,7 +27,13 @@ export default function Carousel() {
         <button aria-label="Previous photo" className={arrow} onClick={() => setI((i + n - 1) % n)}>←</button>
         <button aria-label="Next photo" className={arrow} onClick={() => setI((i + 1) % n)}>→</button>
       </div>
-      <div className="basis-full overflow-hidden rounded-lg shadow-lg">
+      <div
+        className="basis-full overflow-hidden rounded-lg shadow-lg"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={() => setPaused(true)}
+        onTouchEnd={() => setPaused(false)}
+      >
         <div className="flex transition-transform duration-[600ms] ease-[cubic-bezier(.2,.7,.2,1)]" style={{ transform: `translateX(-${i * 100}%)` }}>
           {SLIDES.map((slide, idx) => (
             <div key={idx} className="relative aspect-video max-h-[640px] shrink-0 grow-0 basis-full overflow-hidden bg-ink/40">
@@ -29,7 +45,7 @@ export default function Carousel() {
                 className="object-cover"
                 sizes="(max-width: 1200px) 100vw, 1200px"
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-6 pt-12">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-6 pt-12 pointer-events-none">
                 <span className="font-mono text-xs uppercase tracking-[.14em] text-gold">Radiance Highlights</span>
                 <div className="font-display text-2xl font-bold text-white mt-1">{slide.title}</div>
               </div>
