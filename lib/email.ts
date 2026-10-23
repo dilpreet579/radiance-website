@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { renderTicketPng } from "@/lib/ticket-image";
 
 const FROM = process.env.EMAIL_FROM ?? "Radiance 2026 <onboarding@resend.dev>";
@@ -18,12 +19,34 @@ const MONO = "'Courier New',Courier,monospace";
 const logoImg = (extra = "") => `<img src="${siteUrl()}/email-logo.png" width="432" alt="Radiance 2026 · NIT Delhi" style="display:block;width:100%;max-width:432px;height:auto;${extra}">`;
 
 // Always send a plain-text part with the HTML: HTML-only mail is a classic spam signal.
-export async function sendMail(to: string, subject: string, html: string, text: string, attachments?: { filename: string; content: Buffer; contentId: string }[]) {
+type Attachment = { filename: string; content: Buffer; contentId: string };
+
+// Resend first; if it fails (daily quota, outage) and Brevo SMTP is configured, the same mail goes out through Brevo.
+export async function sendMail(to: string, subject: string, html: string, text: string, attachments?: Attachment[]) {
+  try {
+    await sendViaResend(to, subject, html, text, attachments);
+  } catch (err) {
+    if (!process.env.BREVO_SMTP_USER || !process.env.BREVO_SMTP_KEY) throw err;
+    console.warn("Resend failed, falling back to Brevo:", (err as Error).message);
+    await sendViaBrevo(to, subject, html, text, attachments);
+  }
+}
+
+async function sendViaResend(to: string, subject: string, html: string, text: string, attachments?: Attachment[]) {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY missing");
   if (FROM.includes("resend.dev") && process.env.NODE_ENV === "production") console.warn("EMAIL_FROM is still the Resend sandbox sender; verify a domain.");
   const { error } = await new Resend(key).emails.send({ from: FROM, to, subject, html, text, attachments, replyTo: process.env.EMAIL_REPLY_TO || undefined });
   if (error) throw new Error(error.message);
+}
+
+// BREVO_FROM (default EMAIL_FROM) must be on a domain verified in Brevo; Brevo wants its own subdomain, not the one Resend uses.
+async function sendViaBrevo(to: string, subject: string, html: string, text: string, attachments?: Attachment[]) {
+  const mail = nodemailer.createTransport({ host: "smtp-relay.brevo.com", port: 587, auth: { user: process.env.BREVO_SMTP_USER, pass: process.env.BREVO_SMTP_KEY } });
+  await mail.sendMail({
+    from: process.env.BREVO_FROM || FROM, to, subject, html, text, replyTo: process.env.EMAIL_REPLY_TO || undefined,
+    attachments: attachments?.map((a) => ({ filename: a.filename, content: a.content, cid: a.contentId })),
+  });
 }
 
 export type TicketInfo = { token: string; name: string; type: string; institute: string; roll: string; workshops: string[]; sponsor: SponsorInfo };
