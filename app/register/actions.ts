@@ -3,6 +3,7 @@
 import QRCode from "qrcode";
 import { db } from "@/lib/db";
 import { sendTicket } from "@/lib/email";
+import { markTicketSent } from "@/lib/tickets";
 import { getSettings } from "@/lib/settings";
 import { getTitleSponsor } from "@/lib/sponsors";
 import { WORKSHOP_OPTIONS } from "@/lib/content";
@@ -76,6 +77,7 @@ export async function register(i: RegInput): Promise<RegResult> {
   let emailed = true;
   try {
     await sendTicket(r.email, ticket, data.dup);
+    await markTicketSent(r.token);
   } catch (err) {
     console.error("ticket email", err);
     emailed = false;

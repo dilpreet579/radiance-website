@@ -26,7 +26,8 @@ create table if not exists registrations (
   -- photo walk selection (admin-managed)
   engagement numeric,
   remarks text,
-  walk_selected boolean not null default false
+  walk_selected boolean not null default false,
+  ticket_sent_at timestamptz     -- null = ticket email not sent yet (retried by admin button / cron)
 );
 create unique index if not exists registrations_email_key on registrations (email);
 create unique index if not exists registrations_phone_key on registrations (phone);
