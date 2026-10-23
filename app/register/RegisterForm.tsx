@@ -14,12 +14,16 @@ const EMPTY: Omit<RegInput, "nit" | "workshops" | "consents"> & { inst: string }
 const label = "font-mono text-xs uppercase tracking-[.12em] text-fg-3";
 const errCls = "text-sm font-semibold text-err";
 
+type DoneState =
+  | { dup: false; ticket: Ticket; emailed: boolean }
+  | { dup: true; maskedEmail: string; emailed: boolean };
+
 export default function RegisterForm({ seatsLeft, seatCap, consents }: { seatsLeft: Record<string, number>; seatCap: number; consents: Settings["consents"] }) {
   const [f, setF] = useState(EMPTY);
   const [ws, setWs] = useState<string[]>([]);
   const [cons, setCons] = useState<Record<string, boolean>>({});
   const [err, setErr] = useState<Record<string, string>>({});
-  const [done, setDone] = useState<{ ticket: Ticket; dup: boolean; emailed: boolean } | null>(null);
+  const [done, setDone] = useState<DoneState | null>(null);
   const [pending, start] = useTransition();
   const nit = f.inst === "NIT Delhi";
   const clear = (k: string) => setErr((e) => ({ ...e, [k]: "" }));
@@ -34,7 +38,24 @@ export default function RegisterForm({ seatsLeft, seatCap, consents }: { seatsLe
     });
   }
 
-  if (done) return <TicketView {...done} again={() => { setDone(null); setF(EMPTY); setWs([]); setCons({}); setErr({}); }} />;
+  if (done) {
+    if (done.dup) {
+      return (
+        <AlreadyRegisteredView
+          maskedEmail={done.maskedEmail}
+          emailed={done.emailed}
+          again={() => { setDone(null); setF(EMPTY); setWs([]); setCons({}); setErr({}); }}
+        />
+      );
+    }
+    return (
+      <TicketView
+        ticket={done.ticket}
+        emailed={done.emailed}
+        again={() => { setDone(null); setF(EMPTY); setWs([]); setCons({}); setErr({}); }}
+      />
+    );
+  }
 
   // plain render functions (not components) so inputs keep focus across re-renders
   const chips = (k: keyof typeof EMPTY, opts: string[]) => (
@@ -141,7 +162,52 @@ function Box({ on, className = "" }: { on: boolean; className?: string }) {
   return <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-[5px] border-[1.5px] border-panel text-[15px] font-bold text-cream ${on ? "bg-panel" : ""} ${className}`}>{on ? "✓" : ""}</span>;
 }
 
-function TicketView({ ticket: t, dup, emailed, again }: { ticket: Ticket; dup: boolean; emailed: boolean; again: () => void }) {
+function AlreadyRegisteredView({ maskedEmail, emailed, again }: { maskedEmail: string; emailed: boolean; again: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-6">
+      <div className="flex w-full max-w-[560px] flex-col gap-6 rounded-[18px] bg-cream p-[clamp(24px,4vw,40px)] text-fg shadow-[12px_12px_0_#1E0407]">
+        <div className="flex items-center justify-between border-b border-fg/15 pb-4">
+          <div className="font-mono text-xs uppercase tracking-[.14em] text-rust font-bold">Registration Exists</div>
+          <span className="rounded-full bg-panel px-3 py-1 font-mono text-[11px] uppercase tracking-[.12em] text-cream">Protected Pass</span>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <h2 className="m-0 font-display text-[clamp(28px,4vw,38px)] font-extrabold leading-tight text-panel">
+            You&apos;re already registered
+          </h2>
+          <p className="m-0 text-base leading-relaxed text-fg-2">
+            A registration matching your student details is already confirmed in the Radiance 2026 system.
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-rust/30 bg-cream-2 p-5 flex flex-col gap-2">
+          <div className="font-mono text-xs uppercase tracking-[.12em] text-fg-3">Ticket Emailed To</div>
+          <div className="font-mono text-lg font-bold text-panel break-all">{maskedEmail}</div>
+          <p className="m-0 text-sm text-fg-2 pt-1 leading-normal">
+            {emailed
+              ? "For your privacy and security, entry passes and QR codes are not displayed on screen. A copy of your ticket and QR code has been sent directly to the verified email address above."
+              : "For your privacy and security, entry passes and QR codes are not displayed on screen. Please check your inbox for your original confirmation."}
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-gold/70 bg-gold/[.14] p-4 text-sm leading-relaxed text-fg">
+          💡 <strong>What should I do?</strong> Please check your email inbox (and Spam/Promotions folder) for your ticket and QR code. If you cannot access that email or need help, please visit the registration desk at the venue.
+        </div>
+
+        <div className="flex flex-wrap gap-3 pt-2">
+          <Link href="/" className="btn btn-gold px-[26px] py-3 text-base">
+            Back to home
+          </Link>
+          <button onClick={again} className="btn btn-ghost border border-fg/30 bg-transparent px-[26px] py-3 text-base text-fg hover:border-fg">
+            Register someone else
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TicketView({ ticket: t, emailed, again }: { ticket: Ticket; emailed: boolean; again: () => void }) {
   return (
     <div className="flex flex-wrap items-start justify-center gap-[clamp(28px,5vw,72px)]">
       <div className="w-full basis-[380px] overflow-hidden rounded-[18px] bg-cream text-fg shadow-[12px_12px_0_#1E0407] sm:max-w-[380px]">
@@ -184,11 +250,10 @@ function TicketView({ ticket: t, dup, emailed, again }: { ticket: Ticket; dup: b
         </div>
       </div>
       <div className="flex max-w-[520px] basis-80 flex-1 flex-col gap-[22px]">
-        <div className="font-mono text-[13px] uppercase tracking-[.14em] text-gold">{dup ? "Already registered" : "Registration complete"}</div>
-        <h2 className="m-0 font-display text-[clamp(36px,5vw,64px)] font-extrabold leading-none tracking-[-.02em]">{dup ? "Your ticket is below" : "You are registered"}</h2>
+        <div className="font-mono text-[13px] uppercase tracking-[.14em] text-gold">Registration complete</div>
+        <h2 className="m-0 font-display text-[clamp(36px,5vw,64px)] font-extrabold leading-none tracking-[-.02em]">You are registered</h2>
         <p className="m-0 text-pretty text-[19px]">
-          {dup ? "You have already registered with these details. " : ""}
-          {emailed ? `Your ticket has been ${dup ? "sent again" : "emailed"} to ${t.email}.` : "We could not send the email just now, so please screenshot this ticket."}
+          {emailed ? `Your ticket has been emailed to ${t.email}.` : "We could not send the email just now, so please screenshot this ticket."}
         </p>
         <div className="rounded-lg border border-gold/60 bg-gold/[.08] px-5 py-4 text-base">Take a screenshot of this ticket or keep the email handy; you&apos;ll need to show the QR / token at every event.</div>
         <div className="flex flex-wrap gap-3">
