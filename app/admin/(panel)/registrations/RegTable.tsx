@@ -14,9 +14,10 @@ export type Reg = {
   branch: string;
   nit: boolean;
   at: string;
+  sent: string; // ticket email time (IST), empty if not sent
 };
 
-const COLS = "110px minmax(140px,1.4fr) minmax(110px,1fr) 110px 50px 60px 95px 85px 75px";
+const COLS = "110px minmax(140px,1.4fr) minmax(110px,1fr) 110px 50px 60px 95px 85px 120px 75px";
 const head = "font-mono text-[11px] uppercase tracking-[.1em] text-fg-2";
 const tx = "overflow-hidden text-ellipsis whitespace-nowrap";
 
@@ -36,6 +37,7 @@ export default function RegTable({ rows }: { rows: Reg[] }) {
   const list = rows.filter((r) => !gone.includes(r.id));
   const [q, setQ] = useState("");
   const [f, setF] = useState<"all" | "nit" | "out">("all");
+  const [s, setS] = useState<"all" | "unsent">("all");
 
   // Two-step delete modal state
   const [target, setTarget] = useState<Reg | null>(null);
@@ -50,7 +52,7 @@ export default function RegTable({ rows }: { rows: Reg[] }) {
   });
 
   const ql = q.trim().toLowerCase();
-  const view = list.filter((r) => (!ql || (r.name + r.roll + r.token).toLowerCase().includes(ql)) && (f === "all" || (f === "nit") === r.nit));
+  const view = list.filter((r) => (!ql || (r.name + r.roll + r.token).toLowerCase().includes(ql)) && (f === "all" || (f === "nit") === r.nit) && (s === "all" || !r.sent));
 
   function closeModal() {
     if (deleting) return;
@@ -83,13 +85,14 @@ export default function RegTable({ rows }: { rows: Reg[] }) {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, roll or token"
           className="min-w-0 flex-[0_1_280px] rounded-lg border-[1.5px] border-fg/30 bg-cream-2 px-3.5 py-[11px] text-[15px] text-fg outline-none focus:border-rust" />
         <Chips opts={[["all", "All"], ["nit", "NIT Delhi"], ["out", "Outside"]]} value={f} set={setF} />
+        <Chips opts={[["all", "Any ticket"], ["unsent", "Not sent"]]} value={s} set={setS} />
         <span className="ml-auto font-bold">{view.length} of {list.length} shown</span>
       </div>
 
       <div className="overflow-x-auto rounded-[10px] border border-fg/[.18] bg-cream-2">
-        <div className="min-w-[960px]">
+        <div className="min-w-[1090px]">
           <div className="grid items-center gap-3 border-b border-fg/[.18] bg-hdr px-4 py-3" style={{ gridTemplateColumns: COLS }}>
-            {["Token", "Name", "Institute", "Roll", "Year", "Branch", "Pass", "Registered", "Action"].map((h) => <span key={h} className={head}>{h}</span>)}
+            {["Token", "Name", "Institute", "Roll", "Year", "Branch", "Pass", "Registered", "Ticket sent", "Action"].map((h) => <span key={h} className={head}>{h}</span>)}
           </div>
           {view.map((r) => (
             <div key={r.token} className="grid items-center gap-3 border-b border-fg/10 px-4 py-[9px] text-[15px]" style={{ gridTemplateColumns: COLS }}>
@@ -101,6 +104,7 @@ export default function RegTable({ rows }: { rows: Reg[] }) {
               <span className={tx}>{r.branch}</span>
               <span className={`justify-self-start rounded-full px-2.5 py-[3px] font-mono text-[11px] uppercase tracking-[.08em] ${r.nit ? "bg-panel text-cream" : "border-[1.5px] border-rust text-rust"}`}>{r.nit ? "Universal" : "Workshop"}</span>
               <span className={`text-fg-3 ${tx}`}>{r.at}</span>
+              <span className={`text-[13px] ${r.sent ? "text-fg-3" : "font-bold text-err"} ${tx}`} title={r.sent || "Ticket email not sent"}>{r.sent || "Not sent"}</span>
               <div className="justify-self-start">
                 <button
                   type="button"
