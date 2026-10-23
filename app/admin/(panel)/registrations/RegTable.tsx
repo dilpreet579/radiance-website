@@ -32,7 +32,8 @@ export function Chips<T extends string>({ opts, value, set }: { opts: [T, string
 
 export default function RegTable({ rows }: { rows: Reg[] }) {
   const toast = useToast();
-  const [list, setList] = useState<Reg[]>(rows);
+  const [gone, setGone] = useState<string[]>([]);
+  const list = rows.filter((r) => !gone.includes(r.id));
   const [q, setQ] = useState("");
   const [f, setF] = useState<"all" | "nit" | "out">("all");
 
@@ -42,8 +43,11 @@ export default function RegTable({ rows }: { rows: Reg[] }) {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    setList(rows);
-  }, [rows]);
+    if (!target || deleting) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeModal();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
 
   const ql = q.trim().toLowerCase();
   const view = list.filter((r) => (!ql || (r.name + r.roll + r.token).toLowerCase().includes(ql)) && (f === "all" || (f === "nit") === r.nit));
@@ -60,12 +64,14 @@ export default function RegTable({ rows }: { rows: Reg[] }) {
 
     setDeleting(true);
     try {
-      await deleteRegistration(target.id);
-      setList((prev) => prev.filter((item) => item.id !== target.id));
+      const res = await deleteRegistration(target.id);
+      if (!res.ok) return toast(res.error);
+      setGone((g) => [...g, target.id]);
       toast(`Deleted registration for ${target.name}`);
-      closeModal();
-    } catch (err) {
-      toast((err as Error).message || "Could not delete registration");
+      setTarget(null);
+      setConfirmText("");
+    } catch {
+      toast("Could not delete registration");
     } finally {
       setDeleting(false);
     }

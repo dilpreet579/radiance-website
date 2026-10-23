@@ -6,19 +6,20 @@ import { SLIDES } from "@/lib/content";
 
 export default function Carousel() {
   const [i, setI] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [hover, setHover] = useState(false);
+  const [stopped, setStopped] = useState(false);
+  const paused = hover || stopped;
   const n = SLIDES.length;
   const pad = (x: number) => String(x).padStart(2, "0");
   const arrow = "h-12 w-12 cursor-pointer rounded-full border-[1.5px] border-cream/50 bg-transparent text-xl text-cream hover:bg-gold hover:text-bg transition-colors flex items-center justify-center";
 
   // Automatic slide progression every 4 seconds; pauses on hover or touch
+  // Depends on `i` so any manual change restarts the 4s countdown; skipped for reduced-motion users.
   useEffect(() => {
-    if (paused) return;
-    const timer = setInterval(() => {
-      setI((prev) => (prev + 1) % n);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [paused, n]);
+    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setTimeout(() => setI((prev) => (prev + 1) % n), 4000);
+    return () => clearTimeout(timer);
+  }, [paused, n, i]);
 
   return (
     <>
@@ -26,13 +27,12 @@ export default function Carousel() {
         <span className="mr-1.5 font-mono text-[13px] tracking-[.1em] text-muted">{pad(i + 1)} / {pad(n)}</span>
         <button aria-label="Previous photo" className={arrow} onClick={() => setI((i + n - 1) % n)}>←</button>
         <button aria-label="Next photo" className={arrow} onClick={() => setI((i + 1) % n)}>→</button>
+        <button aria-label={stopped ? "Play slideshow" : "Pause slideshow"} className={arrow} onClick={() => setStopped(!stopped)}>{stopped ? "▶" : "❚❚"}</button>
       </div>
       <div
         className="basis-full overflow-hidden rounded-lg shadow-lg"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onTouchStart={() => setPaused(true)}
-        onTouchEnd={() => setPaused(false)}
+        onPointerEnter={(e) => e.pointerType === "mouse" && setHover(true)}
+        onPointerLeave={(e) => e.pointerType === "mouse" && setHover(false)}
       >
         <div className="flex transition-transform duration-[600ms] ease-[cubic-bezier(.2,.7,.2,1)]" style={{ transform: `translateX(-${i * 100}%)` }}>
           {SLIDES.map((slide, idx) => (
