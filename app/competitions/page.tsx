@@ -7,36 +7,65 @@ import { getSettings } from "@/lib/settings";
 export const revalidate = 60;
 export const metadata = pageMeta("/competitions");
 
-type Comp = { kind: "online" | "campus"; genre: string; title: string; desc: string; prize: string; theme: string; deadline: string; url: string; live: boolean };
+type Comp = {
+  kind: "online" | "campus";
+  genre: string;
+  title: string;
+  desc: string;
+  prize: string;
+  theme: string;
+  deadline: string;
+  url: string;
+  live: boolean;
+};
 
-// Admin-managed rows win; with an empty table, show the placeholder competitions.
+// Admin-managed rows win per category; if a category is empty in DB, show its default placeholders.
 async function load(globalLive: boolean): Promise<Comp[]> {
+  let dbComps: Comp[] = [];
   if (hasDb()) {
     try {
       const { data } = await db().from("competitions").select("*").order("position");
-      if (data?.length) return data.map((r) => ({ ...r, desc: r.description }));
+      if (data) dbComps = data.map((r) => ({ ...r, desc: r.description }));
     } catch {}
   }
-  const ph = (kind: Comp["kind"]) => (c: (typeof ONLINE_COMPS)[number]): Comp => ({ kind, ...c, theme: "See the competition page", deadline: "3 Nov, 11:59 PM", url: "#", live: globalLive });
-  return [...ONLINE_COMPS.map(ph("online")), ...CAMPUS_COMPS.map(ph("campus"))];
+
+  const dbOnline = dbComps.filter((c) => c.kind === "online");
+  const dbCampus = dbComps.filter((c) => c.kind === "campus");
+
+  const ph = (kind: Comp["kind"]) => (c: (typeof ONLINE_COMPS)[number]): Comp => ({
+    kind,
+    ...c,
+    theme: "See the competition page",
+    deadline: "3 Nov, 11:59 PM",
+    url: "#",
+    live: globalLive,
+  });
+
+  const online = dbOnline.length > 0 ? dbOnline : ONLINE_COMPS.map(ph("online"));
+  const campus = dbCampus.length > 0 ? dbCampus : CAMPUS_COMPS.map(ph("campus"));
+
+  return [...online, ...campus];
 }
 
 function Card({ c }: { c: Comp }) {
   const campus = c.kind === "campus";
   const soon = "Announced 26 Oct";
-  const live = c.live && !!c.url;
+  const live = Boolean(c.live && c.url && c.url.trim() !== "" && c.url.trim() !== "#");
   const rows: [string, string][] = [
     ["Prize", live ? c.prize : soon],
     ["Theme", live ? c.theme || "—" : soon],
     ["Deadline", live ? c.deadline || "—" : soon],
   ];
-  const btnBase = "btn px-[22px] py-3.5 text-base";
+  const btnBase = "btn px-[22px] py-3.5 text-base cursor-pointer";
   const btn = live
     ? `${btnBase} ${campus ? "btn-gold" : "btn-rust"}`
     : `${btnBase} pointer-events-none border-[1.5px] border-dashed ${campus ? "border-cream/45 text-muted" : "border-fg/40 text-fg-3"}`;
+
   return (
     <div className={`flex flex-col gap-4 rounded-lg p-[clamp(22px,3vw,30px)] ${campus ? "border border-cream/30 bg-ink/35" : "bg-cream text-fg"}`}>
-      <span className={`self-start rounded-full border px-3 py-1 font-mono text-[11px] uppercase tracking-[.12em] ${campus ? "border-gold/60 text-gold" : "border-rust/60 text-rust"}`}>{c.genre}</span>
+      <span className={`self-start rounded-full border px-3 py-1 font-mono text-[11px] uppercase tracking-[.12em] ${campus ? "border-gold/60 text-gold" : "border-rust/60 text-rust"}`}>
+        {c.genre}
+      </span>
       <div className="font-display text-[28px] font-extrabold leading-[1.05]">{c.title}</div>
       <p className={`m-0 flex-1 text-base ${campus ? "text-soft" : "text-fg-2"}`}>{c.desc}</p>
       <div className={`grid gap-x-[18px] gap-y-2 border-t pt-3.5 text-[15px] [grid-template-columns:auto_1fr] ${campus ? "border-cream/20" : "border-fg/20"}`}>
@@ -47,8 +76,13 @@ function Card({ c }: { c: Comp }) {
           </div>
         ))}
       </div>
-      <a href={live ? c.url : undefined} target={live ? "_blank" : undefined} rel="noreferrer" className={btn}>
-        {live ? (campus ? "Open Google Form ↗" : "Go to Unstop ↗") : "Coming soon"}
+      <a
+        href={live ? c.url : undefined}
+        target={live ? "_blank" : undefined}
+        rel="noopener noreferrer"
+        className={btn}
+      >
+        {live ? (campus ? "Submit Entry ↗" : "Go to Unstop ↗") : "Coming soon"}
       </a>
     </div>
   );
@@ -69,7 +103,8 @@ function Group({ title, sub, children }: { title: string; sub: string; children:
 export default async function Competitions() {
   const s = await getSettings();
   const comps = await load(s.competitions_live);
-  const anyLive = comps.some((c) => c.live && c.url);
+  const anyLive = comps.some((c) => c.live && c.url && c.url !== "#");
+
   return (
     <>
       <PageHeader path="/competitions" />
@@ -78,7 +113,9 @@ export default async function Competitions() {
           <div className="flex flex-wrap items-center gap-x-[18px] gap-y-2 rounded-lg border border-gold/60 bg-gold/[.08] px-[22px] py-4">
             <span className="eyebrow">{anyLive ? "Live now" : "Coming soon"}</span>
             <span className="text-base">
-              {anyLive ? "Competition links are live. Submit your entries before the deadlines." : "Competitions go live on 26 Oct, the inaugural day. Links and details appear here."}
+              {anyLive
+                ? "Competition links are live. Submit your entries before the deadlines."
+                : "Competitions go live on 26 Oct, the inaugural day. Links and details appear here."}
             </span>
           </div>
           <Group title="Online on Unstop" sub="All-India · free · open to all students">

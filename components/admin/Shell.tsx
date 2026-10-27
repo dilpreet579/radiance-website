@@ -32,13 +32,13 @@ export default function Shell({ signOut, children }: { signOut: () => Promise<vo
         <div className="flex min-h-0 flex-1">
           <aside className="sticky top-[60px] hidden h-[calc(100vh-60px)] flex-[0_0_220px] flex-col gap-1 self-start bg-panel px-3 py-5 min-[900px]:flex">
             {NAV.map(([h, l]) => (
-              <Link key={h} href={h} className={`rounded-lg px-3.5 py-[11px] text-[15px] font-semibold ${on(h) ? "bg-cream !text-bg" : "!text-soft hover:bg-cream/10"}`}>{l}</Link>
+              <Link key={h} href={h} prefetch={false} className={`rounded-lg px-3.5 py-[11px] text-[15px] font-semibold ${on(h) ? "bg-cream !text-bg" : "!text-soft hover:bg-cream/10"}`}>{l}</Link>
             ))}
           </aside>
           <div className="flex min-w-0 flex-1 flex-col">
             <div className="flex gap-2 overflow-x-auto bg-panel px-[clamp(16px,3vw,28px)] py-3 min-[900px]:hidden">
               {NAV.map(([h, l]) => (
-                <Link key={h} href={h} className={`whitespace-nowrap rounded-full border-[1.5px] px-4 py-2 text-sm font-semibold ${on(h) ? "border-cream bg-cream !text-bg" : "border-cream/40 !text-cream"}`}>{l}</Link>
+                <Link key={h} href={h} prefetch={false} className={`whitespace-nowrap rounded-full border-[1.5px] px-4 py-2 text-sm font-semibold ${on(h) ? "border-cream bg-cream !text-bg" : "border-cream/40 !text-cream"}`}>{l}</Link>
               ))}
             </div>
             <main className="flex w-full max-w-[1400px] flex-col gap-6 px-[clamp(16px,3vw,40px)] pb-20 pt-[clamp(20px,3vw,40px)]">{children}</main>
