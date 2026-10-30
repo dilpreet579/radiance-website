@@ -21,8 +21,8 @@ export async function GET(req: Request) {
   } else if (type === "leaderboard" || type === "shortlist") {
     const all = await leaderboard();
     const list = type === "shortlist" ? all.filter((r) => r.selected) : all;
-    rows = [["Token", "Name", "Roll", "Branch", "Year", "Sessions attended", ...CORE, "Engagement", "Remarks", "Selected"],
-      ...list.map((r) => [r.token, r.name, r.roll, r.branch, r.year, r.count, ...CORE.map((k) => (r.attended.includes(k) ? "Y" : "")), r.engagement, r.remarks, r.selected ? "Y" : ""])];
+    rows = [["Token", "Name", "Roll", "Phone", "Branch", "Year", "Sessions attended", ...CORE, "Engagement", "Remarks", "Selected"],
+      ...list.map((r) => [r.token, r.name, r.roll, r.phone, r.branch, r.year, r.count, ...CORE.map((k) => (r.attended.includes(k) ? "Y" : "")), r.engagement, r.remarks, r.selected ? "Y" : ""])];
   } else if (type === "attendance") {
     const session = u.searchParams.get("session") ?? "";
     const { data } = await sb.from("scans").select("scanned_at,admin_email,registrations(token,name,roll,institute,phone,email),checkpoints(name)").eq("session_key", session).order("scanned_at");
